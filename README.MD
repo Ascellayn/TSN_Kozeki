@@ -21,7 +21,8 @@ You should end up with a `Extracted` and `Unknown` folder, the Extracted Folder 
 <br>
 
 #### Why Kozeki?
-Thought it'd made sense since Ui is capable of restoring something that is nye unreadable to mere mortals such as every single one of us.  
+Thought it'd made sense to name this script by Ui from a certain epic anime rpg video game since she's capable of restoring something that is nye unreadable to mere mortals such as every single one of us.  
+It is also tradition to name any new project that I'm working on by something Blue Archive related. Kozeki is technically a codename, if you find a better name for this script, feel free to give me suggestions.  
 Also technically a tool already exists [here](https://github.com/TanyanArchitect/Blue-Archive-Steam-version-MOLRU-files-extractor), however I do not trust AI Slop and trust my garbage code significantly more. Yes I seriously rewrote this tool because I didn't want to touch AI Generated scripts (and also because I think in my opinion this is going to be much more readable and maintainable). Cancel me on my Twitter dot com if you don't agree with my childish move instead of pulling a nuclear pull request. [It's right there](https://twitter.com/siriusbyt).  
 
 <br>
