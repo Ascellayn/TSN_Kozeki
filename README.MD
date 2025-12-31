@@ -1,12 +1,13 @@
 # Kozeki
 A TSNA based tool to extract Blue Archive's `.molru` PC files, a cursed file type given to us who like to poke around a bit too much.  
 If you are unaware, since a few updates ago, Blue Archive on Steam recently started obfuscating the game files, which is quite the annoyance if you want to grab an image for a meme or a thumbnail or something.  
-This tool's purpose is to be able to extract those files, and maybe some more in the future.
+This tool's purpose is to be able to extract those files, and maybe some more in the future.  
+Kozeki will in the future be able to recreate from scratch `.molru` files, although its utility might be questionable due to the Anti-Cheat.  
 
 <br>
 
 > [!CAUTION]
-> This tool is VERY MUCH unfinished and is in a **proof of concept** stage. Certain information in the README may entirely be false for now as... My lazy ass is in the process of writing it.  
+> This tool is VERY MUCH unfinished and is in a **proof of concept** stage.  
 > As of right now it only supports **JPEG** files, although implementing more file types should be easy.
 
 <br>
