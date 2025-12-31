@@ -5,7 +5,7 @@ This tool's purpose is to be able to extract those files, and maybe some more in
 
 <br>
 
-> ![CAUTION]
+> [!CAUTION]
 > This tool is VERY MUCH unfinished and is in a **proof of concept** stage. Certain information in the README may entirely be false for now as... My lazy ass is in the process of writing it.  
 > As of right now it only supports **JPEG** files, although implementing more file types should be easy.
 
