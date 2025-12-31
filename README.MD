@@ -13,11 +13,13 @@ Kozeki will in the future be able to recreate from scratch `.molru` files, altho
 <br>
 
 ## Setup
-**Notice:** Kozeki is primarily tested on **Linux**, while a few tests showed that it seems fine on Windows, I cannot guarantee that it will work correctly.  
-- Install [TSN Abstracter](https://github.com/Ascellayn/TSN_Abstracter), you can simply just drag and drop the `TSN_Abstracter` folder where `TSN_Kozeki.py` is located, which should be at **the root folder of Blue Archive** or if you're more advanced, do some fancy `PYTHONPATH` thingy.
+**Notice:** Kozeki is primarily tested on **Linux**, while a few tests showed that it seems fine on Windows, I cannot do extended tests so it's possible that some things may be weird!  
+- Download [TSN_Kozeki.py](https://raw.githubusercontent.com/Ascellayn/TSN_Kozeki/refs/heads/main/TSN_Kozeki.py) and place the file at the root of your Blue Archive Folder (the one containing the Blue Archive Executable).
+- Install [TSN Abstracter](https://github.com/Ascellayn/TSN_Abstracter), you can simply just drag and drop the `TSN_Abstracter` folder where `TSN_Kozeki.py` is located or if you're more advanced, clone the TSNA repository and add the cloned folder to your `PYTHONPATH`.
 - Run `python3 TSN_Kozeki.py` in your favorite terminal and watch it go!
 
-You should end up with a `Extracted` and `Unknown` folder, the Extracted Folder contains the goods, the Unknown folder contains Schizophrenia fuel (stuff that needs to be implemented and handled by Kozeki later on).
+You should end up with a `Extracted` folder, processing certain `molru` files may take a while depending on their size. The stronger your computer is at single-threaded tasks the faster it should run.  
+A future update will introduce partial multi-threading as a desperate attempt to make it more bearable to extract everything at once.
 
 <br>
 
