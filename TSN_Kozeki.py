@@ -95,11 +95,13 @@ def Help():
 	print("\t-h\t\t\t= Print usage information and exit.");
 	print("\t-d\t\t\t= Enable Debug Mode.");
 	print("");
-	print("\t--extractor <extractor>\t= Enforce an extraction method. Available ones are: 'deep', 'regex', 'slow'. (default: 'regex').");
+	print("\t--extractor <extractor>\t= Enforce an extraction method. Available ones are: 'regex'. (default: 'regex').");
 
 
 
 if (__name__ == '__main__'):
+	Log.Stateless(f"Kozeki {Kozeki_Branch} - {Kozeki_Version} © Ascellayn (2025) // TSN License 2.1 - Universal");
+	Log.Stateless("Kozeki is a TSNA based tool to extract Blue Archive's .molru PC files, a cursed file type given to us who like to poke around a bit too much.\n");
 	global Debug_Mode; Debug_Mode: bool;
 	TSN_Abstracter.Require_Version((5,4,0));
 
