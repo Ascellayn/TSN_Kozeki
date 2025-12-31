@@ -2,7 +2,7 @@ from TSN_Abstracter import *;
 import re, sys, typing;
 
 Log.Clear();
-Kozeki_Version: str = "v0.3.0";
+Kozeki_Version: str = "v0.3.1";
 Kozeki_Branch: str = "Azure";
 
 
@@ -16,7 +16,7 @@ def Extract_Regex(F: str) -> None:
 
 	Log.Debug(f"Attempting to find files, this may take a while...");
 	Extract: typing.Iterator[re.Match[bytes]] | None = re.finditer(b"""
-	((?=\xFF\xD8.+\x4A\x46\x49\x46).+?(?<=\xFF\xD9))| # JFIF (Group 1)
+	(\xFF\xD8.+?\x4A\x46\x49\x46.+?\xFF\xD9)| # JFIF (Group 1)
 	(\xFF) # Test (Group 2)
 	""", Bytes, re.DOTALL + re.VERBOSE);
 	Log.Awaited().OK();
@@ -25,8 +25,9 @@ def Extract_Regex(F: str) -> None:
 	Offset: int = 0;
 	def Write_Unknown(Start: int) -> None:
 		if (Start - Offset == 0): return;
-		Log.Info(f"Writing unknown hex of {Start} bytes in size...");
+		Log.Info(f"Writing unknown hex of {Start} bytes in size at 0x{Offset}-0x{Start}...");
 		with open(f"Extracted/{F.replace(".molru", "")}/0x{Offset}-0x{Start}.hex", "w+b") as IO: IO.write(Bytes[Offset:Start]);
+		Log.Awaited().OK();
 
 	def Found(Indexes: tuple[int, int]) -> bool: return False if (Indexes == (-1, -1)) else True;
 	for Match in Extract:
