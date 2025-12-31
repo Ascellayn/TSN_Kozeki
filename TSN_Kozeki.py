@@ -2,7 +2,7 @@ from TSN_Abstracter import *;
 import re, sys, typing;
 
 Log.Clear();
-Kozeki_Version: str = "v0.2.1";
+Kozeki_Version: str = "v0.3.0";
 Kozeki_Branch: str = "Azure";
 
 
