@@ -2,7 +2,7 @@ from TSN_Abstracter import *;
 import re, sys, typing;
 
 Log.Clear();
-Kozeki_Version: str = "v0.4.0";
+Kozeki_Version: str = "v0.5.0";
 Kozeki_Branch: str = "Azure";
 
 
@@ -16,8 +16,9 @@ def Extract_Regex(F: str) -> None:
 
 	Log.Debug(f"Attempting to find files, this may take a while...");
 	Extract: typing.Iterator[re.Match[bytes]] | None = re.finditer(b"""
-		(\xFF\xD8.+?\x4A\x46\x49\x46.+?\xFF\xD9)|	# JFIF (Group 1)
-		(\x4F\x67\x67\x53)							# OGG (Group 2)
+		(\xFF\xD8....\x4A\x46\x49\x46.+?\xFF\xD9)|			# JFIF (Group 1)
+		(\x4F\x67\x67\x53)|									# OGG (Group 2)
+		(\x89\x50\x4E\x47.+?(?:\x49\x45\x4E\x44)....)	# PNG (Group 3)
 	""", Bytes, re.DOTALL + re.VERBOSE);
 	Log.Awaited().OK();
 
@@ -39,6 +40,7 @@ def Extract_Regex(F: str) -> None:
 			Write_Unknown(Start);
 			Offset = End; continue;
 
+
 		if (Found(Match.span(2))): # OGG
 			Start: int = Match.span(2)[0];
 			Segments: int = int.from_bytes(Bytes[Start+27:Start+28:]);
@@ -59,6 +61,13 @@ def Extract_Regex(F: str) -> None:
 			Write_Unknown(Buffer_Start); # Write Unknown is broken here for post-molru headers, I can't be arsed figuring out a solution right now though.
 			continue;
 
+
+		if (Found(Match.span(3))): # PNG
+			Start: int = Match.span(3)[0]; End: int = Match.span(3)[1];
+			Log.Info(f"Found PNG of {End - Start} Bytes in size at 0x{Start}-0x{End}");
+			with open(f"Extracted/{F.replace(".molru", "")}/0x{Start}-0x{End}.png", "w+b") as Img: Img.write(Bytes[Start:End]);
+			Write_Unknown(Start);
+			Offset = End; continue;
 
 	Log.Info(f"Finished Processing \"{F}\" in {Time.Elapsed_String(Time.Get_Unix(True) - Molru_Init, " ", Show_Until=-3)}");
 

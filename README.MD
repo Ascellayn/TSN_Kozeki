@@ -8,7 +8,7 @@ Kozeki will in the future be able to recreate from scratch `.molru` files, altho
 
 > [!CAUTION]
 > This tool is VERY MUCH unfinished and is in a **proof of concept** stage.  
-> As of right now it only supports **JPEG** and **OGG** files, although implementing more file types should be easy.
+> As of right now it only supports **JPEG**, **PNG** and **OGG** files, although implementing more file types should be easy.
 
 <br>
 
