@@ -2,7 +2,7 @@ from TSN_Abstracter import *;
 import re, sys, typing;
 
 Log.Clear();
-Kozeki_Version: str = "v0.5.0";
+Kozeki_Version: str = "v0.5.1";
 Kozeki_Branch: str = "Azure";
 
 
@@ -10,11 +10,13 @@ Kozeki_Branch: str = "Azure";
 def Extract_Regex(F: str) -> None:
 	""" Regex extraction, requires a hefty amount of memory and can be slow for larger files."""
 	Molru_Init: int = Time.Get_Unix(True);
+	Molru_Name: str = F.split("/")[-1];
+
 	File.Path_Require(f"Extracted/{F.replace(".molru", "")}/");
 
 	with open(F, "r+b") as Molru: Bytes: bytes = Molru.read();
 
-	Log.Debug(f"Attempting to find files, this may take a while...");
+	Log.Debug(f"{Molru_Name}: Analyzing...");
 	Extract: typing.Iterator[re.Match[bytes]] | None = re.finditer(b"""
 		(\xFF\xD8....\x4A\x46\x49\x46.+?\xFF\xD9)|			# JFIF (Group 1)
 		(\x4F\x67\x67\x53)|									# OGG (Group 2)
@@ -26,7 +28,7 @@ def Extract_Regex(F: str) -> None:
 	Offset: int = 0;
 	def Write_Unknown(Start: int) -> None:
 		if (Start - Offset == 0): return;
-		Log.Warning(f"Writing unknown hex of {Start} bytes in size at 0x{Offset}-0x{Start}...");
+		Log.Warning(f"{Molru_Name}: Unknown Hex of {Start} Bytes @ 0x{Offset}-0x{Start}...");
 		with open(f"Extracted/{F.replace(".molru", "")}/0x{Offset}-0x{Start}.hex", "w+b") as Img: Img.write(Bytes[Offset:Start]);
 		Log.Awaited().OK();
 
@@ -35,7 +37,7 @@ def Extract_Regex(F: str) -> None:
 	for Match in Extract:
 		if (Found(Match.span(1))): # JFIF
 			Start: int = Match.span(1)[0]; End: int = Match.span(1)[1];
-			Log.Info(f"Found JFIF of {End - Start} Bytes in size at 0x{Start}-0x{End}");
+			Log.Info(f"{Molru_Name}: JFIF of {End - Start} Bytes @ 0x{Start}-0x{End}");
 			with open(f"Extracted/{F.replace(".molru", "")}/0x{Start}-0x{End}.jpg", "w+b") as Img: Img.write(Bytes[Start:End]);
 			Write_Unknown(Start);
 			Offset = End; continue;
@@ -46,30 +48,29 @@ def Extract_Regex(F: str) -> None:
 			Segments: int = int.from_bytes(Bytes[Start+27:Start+28:]);
 			End: int = Start + 28 + Segments;
 
-			Log.Debug(f"OGG Header | Segments: {Segments} - Start: 0x{Start} - End: 0x{End} - Bytes: {End - Start}");
+			Log.Debug(f"{Molru_Name}: OGG Header | Segments: {Segments} - Start: 0x{Start} - End: 0x{End} - Bytes: {End - Start}");
 
 			if (Serial == Bytes[Start+14:Start+18]): continue;
 			Serial = Bytes[Start+14:Start+18];
 
-			Log.Info(f"Found OGG of {End - Buffer_Start} Bytes in size at 0x{Buffer_Start}-0x{Start}");
+			Log.Info(f"{Molru_Name}: OGG of {End - Buffer_Start} Bytes @ 0x{Buffer_Start}-0x{Start}");
 			if (Buffer_Start != 0): # Band-aid fix... Otherwise shit keeps creating a bad OGG file
 				with open(f"Extracted/{F.replace(".molru", "")}/0x{Buffer_Start}-0x{Start}.ogg", "w+b") as Audio: Audio.write(Bytes[Buffer_Start:Start]);
 				Offset = Start;
 
 			Buffer_Start = Start;
-			Log.Debug(f"Buffer_Start: {Buffer_Start} - Offset: {Offset}");
 			Write_Unknown(Buffer_Start); # Write Unknown is broken here for post-molru headers, I can't be arsed figuring out a solution right now though.
 			continue;
 
 
 		if (Found(Match.span(3))): # PNG
 			Start: int = Match.span(3)[0]; End: int = Match.span(3)[1];
-			Log.Info(f"Found PNG of {End - Start} Bytes in size at 0x{Start}-0x{End}");
+			Log.Info(f"{Molru_Name}: PNG of {End - Start} Bytes @ 0x{Start}-0x{End}");
 			with open(f"Extracted/{F.replace(".molru", "")}/0x{Start}-0x{End}.png", "w+b") as Img: Img.write(Bytes[Start:End]);
 			Write_Unknown(Start);
 			Offset = End; continue;
 
-	Log.Info(f"Finished Processing \"{F}\" in {Time.Elapsed_String(Time.Get_Unix(True) - Molru_Init, " ", Show_Until=-3)}");
+	Log.Warning(f"{F}: Finished Processing in {Time.Elapsed_String(Time.Get_Unix(True) - Molru_Init, " ", Show_Until=-3)}");
 
 
 
@@ -130,7 +131,7 @@ def Help():
 if (__name__ == '__main__'):
 	Log.Stateless(f"Kozeki {Kozeki_Branch} - {Kozeki_Version} © Ascellayn (2025) // TSN License 2.1 - Universal");
 	Log.Stateless("Kozeki is a TSNA based tool to extract Blue Archive's .molru PC files, a cursed file type given to us who like to poke around a bit too much.\n");
-	global Debug_Mode; Debug_Mode: bool = True;
+	global Debug_Mode; Debug_Mode: bool;
 	TSN_Abstracter.Require_Version((5,4,0));
 
 	# Argument Configuration
