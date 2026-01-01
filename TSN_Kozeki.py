@@ -2,7 +2,7 @@ from TSN_Abstracter import *;
 import re, sys, typing;
 
 Log.Clear();
-Kozeki_Version: str = "v0.5.1";
+Kozeki_Version: str = "v0.5.2";
 Kozeki_Branch: str = "Azure";
 
 
@@ -37,7 +37,7 @@ def Extract_Regex(F: str) -> None:
 	for Match in Extract:
 		if (Found(Match.span(1))): # JFIF
 			Start: int = Match.span(1)[0]; End: int = Match.span(1)[1];
-			Log.Info(f"{Molru_Name}: JFIF of {End - Start} Bytes @ 0x{Start}-0x{End}");
+			Log.Stateless(f"{Molru_Name}: JFIF of {End - Start} Bytes @ 0x{Start}-0x{End}");
 			with open(f"Extracted/{F.replace(".molru", "")}/0x{Start}-0x{End}.jpg", "w+b") as Img: Img.write(Bytes[Start:End]);
 			Write_Unknown(Start);
 			Offset = End; continue;
@@ -53,7 +53,7 @@ def Extract_Regex(F: str) -> None:
 			if (Serial == Bytes[Start+14:Start+18]): continue;
 			Serial = Bytes[Start+14:Start+18];
 
-			Log.Info(f"{Molru_Name}: OGG of {End - Buffer_Start} Bytes @ 0x{Buffer_Start}-0x{Start}");
+			Log.Stateless(f"{Molru_Name}: OGG of {End - Buffer_Start} Bytes @ 0x{Buffer_Start}-0x{Start}");
 			if (Buffer_Start != 0): # Band-aid fix... Otherwise shit keeps creating a bad OGG file
 				with open(f"Extracted/{F.replace(".molru", "")}/0x{Buffer_Start}-0x{Start}.ogg", "w+b") as Audio: Audio.write(Bytes[Buffer_Start:Start]);
 				Offset = Start;
@@ -65,12 +65,12 @@ def Extract_Regex(F: str) -> None:
 
 		if (Found(Match.span(3))): # PNG
 			Start: int = Match.span(3)[0]; End: int = Match.span(3)[1];
-			Log.Info(f"{Molru_Name}: PNG of {End - Start} Bytes @ 0x{Start}-0x{End}");
+			Log.Stateless(f"{Molru_Name}: PNG of {End - Start} Bytes @ 0x{Start}-0x{End}");
 			with open(f"Extracted/{F.replace(".molru", "")}/0x{Start}-0x{End}.png", "w+b") as Img: Img.write(Bytes[Start:End]);
 			Write_Unknown(Start);
 			Offset = End; continue;
 
-	Log.Warning(f"{F}: Finished Processing in {Time.Elapsed_String(Time.Get_Unix(True) - Molru_Init, " ", Show_Until=-3)}");
+	Log.Info(f"{F}: Finished Processing in {Time.Elapsed_String(Time.Get_Unix(True) - Molru_Init, " ", Show_Until=-3)}");
 
 
 
