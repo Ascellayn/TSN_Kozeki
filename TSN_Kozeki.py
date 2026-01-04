@@ -2,7 +2,7 @@ from TSN_Abstracter import *;
 import re, sys, typing;
 
 Log.Clear();
-Kozeki_Version: str = "v0.5.4";
+Kozeki_Version: str = "v0.5.5";
 Kozeki_Branch: str = "Azure";
 
 
@@ -152,7 +152,7 @@ def Help():
 	print("\t-d\t\t\t= Enable Debug Mode.");
 	print("");
 	print("\t--extractor <extractor>\t= Enforce an extraction method. Available ones are: 'regex'. (default: 'regex').");
-
+	print("\t--repack <folder>\t= The folder containing the data we wish to repack as a Molru file.");
 
 
 if (__name__ == '__main__'):
@@ -163,6 +163,7 @@ if (__name__ == '__main__'):
 
 	# Argument Configuration
 	Extractor: str = "regex";
+	Repack_Folder: str | None = None;
 
 	if (len(sys.argv) > 1):
 		sys.argv.pop(0); # Useless
@@ -172,7 +173,8 @@ if (__name__ == '__main__'):
 		try:
 			for Argument in sys.argv:
 				match Argument:
-					case "--extractor": Word_Filename = sys.argv.pop(1);
+					case "--extractor": Extractor = sys.argv.pop(1);
+					case "--repack": Repack_Folder = sys.argv.pop(1);
 					case "-d": Debug_Mode = True; print("== DEBUG MODE ENABLED ==");
 					case _: raise Exception(f"Unknown argument: {Argument}");
 				sys.argv.pop(0);
