@@ -2,7 +2,7 @@ from TSN_Abstracter import *;
 import re, sys, typing;
 
 Log.Clear();
-Kozeki_Version: str = "v0.5.2";
+Kozeki_Version: str = "v0.5.3";
 Kozeki_Branch: str = "Azure";
 
 
@@ -10,12 +10,11 @@ Kozeki_Branch: str = "Azure";
 def Extract_Regex(F: str) -> None:
 	""" Regex extraction, requires a hefty amount of memory and can be slow for larger files."""
 	Molru_Init: int = Time.Get_Unix(True);
+	
 	Molru_Name: str = F.split("/")[-1];
-
 	File.Path_Require(f"Extracted/{F.replace(".molru", "")}/");
 
 	with open(F, "r+b") as Molru: Bytes: bytes = Molru.read();
-
 	Log.Debug(f"{Molru_Name}: Analyzing...");
 	Extract: typing.Iterator[re.Match[bytes]] | None = re.finditer(b"""
 		(\xFF\xD8....\x4A\x46\x49\x46.+?\xFF\xD9)|			# JFIF (Group 1)
@@ -25,48 +24,70 @@ def Extract_Regex(F: str) -> None:
 	Log.Awaited().OK();
 
 
-	Offset: int = 0;
+
+
+
+	Trailing_Zeros: int = len(str(len(Bytes))); 
 	def Write_Unknown(Start: int) -> None:
 		if (Start - Offset == 0): return;
-		Log.Warning(f"{Molru_Name}: Unknown Hex of {Start} Bytes @ 0x{Offset}-0x{Start}...");
-		with open(f"Extracted/{F.replace(".molru", "")}/0x{Offset}-0x{Start}.hex", "w+b") as Img: Img.write(Bytes[Offset:Start]);
+		Log.Warning(f"{Molru_Name}: Unknown Hex of {Start - Offset} Bytes @ 0x{String.Trailing_Zero(Offset, Trailing_Zeros)}-0x{String.Trailing_Zero(Start, Trailing_Zeros)}...");
+		with open(f"Extracted/{F.replace(".molru", "")}/0x{String.Trailing_Zero(Offset, Trailing_Zeros)}-0x{String.Trailing_Zero(Start, Trailing_Zeros)}.hex", "w+b") as Img: Img.write(Bytes[Offset:Start]);
 		Log.Awaited().OK();
 
-	Buffer_Start: int = 0; Serial: bytes = b"";
+
+	def Write_Data(Type: str, Extension: str, Start: int, End: int) -> None:
+		Log.Stateless(f"{Molru_Name}: {Type} of {End - Start} Bytes @ 0x{String.Trailing_Zero(Start, Trailing_Zeros)}-0x{String.Trailing_Zero(End, Trailing_Zeros)}");
+		with open(f"Extracted/{F.replace(".molru", "")}/0x{String.Trailing_Zero(Start, Trailing_Zeros)}-0x{String.Trailing_Zero(End, Trailing_Zeros)}.{Extension}", "w+b") as Data: Data.write(Bytes[Start:End]);
+
+
+
+
+
+	Offset: int = 0; Buffer_Start: int = 0; # Generic Dynamic Values
+	Serial: bytes = b""; # OGG Specific Variable, read OGG Section
+
+
+
 	def Found(Indexes: tuple[int, int]) -> bool: return False if (Indexes == (-1, -1)) else True;
 	for Match in Extract:
 		if (Found(Match.span(1))): # JFIF
 			Start: int = Match.span(1)[0]; End: int = Match.span(1)[1];
-			Log.Stateless(f"{Molru_Name}: JFIF of {End - Start} Bytes @ 0x{Start}-0x{End}");
-			with open(f"Extracted/{F.replace(".molru", "")}/0x{Start}-0x{End}.jpg", "w+b") as Img: Img.write(Bytes[Start:End]);
+			Write_Data("JFIF", "jpeg", Start, End);
 			Write_Unknown(Start);
 			Offset = End; continue;
+
+
+
 
 
 		if (Found(Match.span(2))): # OGG
 			Start: int = Match.span(2)[0];
 			Segments: int = int.from_bytes(Bytes[Start+27:Start+28:]);
 			End: int = Start + 28 + Segments;
+			Log.Debug(f"{Molru_Name}: OGG Header | Segments: {Segments} - Start: 0x{String.Trailing_Zero(Start, Trailing_Zeros)} - End: 0x{String.Trailing_Zero(End, Trailing_Zeros)} - Bytes: {End - Start}");
 
-			Log.Debug(f"{Molru_Name}: OGG Header | Segments: {Segments} - Start: 0x{Start} - End: 0x{End} - Bytes: {End - Start}");
 
+			# The only way for us to reliably parse OGG files is by checking the bitstream serial.
 			if (Serial == Bytes[Start+14:Start+18]): continue;
 			Serial = Bytes[Start+14:Start+18];
 
-			Log.Stateless(f"{Molru_Name}: OGG of {End - Buffer_Start} Bytes @ 0x{Buffer_Start}-0x{Start}");
+
 			if (Buffer_Start != 0): # Band-aid fix... Otherwise shit keeps creating a bad OGG file
-				with open(f"Extracted/{F.replace(".molru", "")}/0x{Buffer_Start}-0x{Start}.ogg", "w+b") as Audio: Audio.write(Bytes[Buffer_Start:Start]);
+				Write_Data("OGG", "ogg", Buffer_Start, Start);
 				Offset = Start;
+
 
 			Buffer_Start = Start;
 			Write_Unknown(Buffer_Start); # Write Unknown is broken here for post-molru headers, I can't be arsed figuring out a solution right now though.
 			continue;
 
 
+
+
+
 		if (Found(Match.span(3))): # PNG
 			Start: int = Match.span(3)[0]; End: int = Match.span(3)[1];
-			Log.Stateless(f"{Molru_Name}: PNG of {End - Start} Bytes @ 0x{Start}-0x{End}");
-			with open(f"Extracted/{F.replace(".molru", "")}/0x{Start}-0x{End}.png", "w+b") as Img: Img.write(Bytes[Start:End]);
+			Write_Data("PNG", "png", Start, End);
 			Write_Unknown(Start);
 			Offset = End; continue;
 
