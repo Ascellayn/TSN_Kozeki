@@ -2,7 +2,7 @@ from TSN_Abstracter import *;
 import re, sys, typing;
 
 Log.Clear();
-Kozeki_Version: str = "v0.5.3";
+Kozeki_Version: str = "v0.5.4";
 Kozeki_Branch: str = "Azure";
 
 
@@ -91,6 +91,12 @@ def Extract_Regex(F: str) -> None:
 			Write_Unknown(Start);
 			Offset = End; continue;
 
+
+
+
+
+	# Catch unknown data at the end of files
+	if (Offset != len(Bytes)): Write_Unknown(Offset);
 	Log.Info(f"{F}: Finished Processing in {Time.Elapsed_String(Time.Get_Unix(True) - Molru_Init, " ", Show_Until=-3)}");
 
 
