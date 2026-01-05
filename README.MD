@@ -23,6 +23,14 @@ A future update will introduce partial multi-threading as a desperate attempt to
 
 <br>
 
+## Repacking (Editing / Creating Molru Files)
+The Kozeki Repacker currently does not create Molru files that can be loaded by Blue Archive.  
+nWe currently do not know how the Molru headers from Hex 0x04 to 0x34 work, which in turn, as likely a checksum is present, makes the game refuse to load properly the Molru file even if you bypass the "Abnormal Client Detected" message.  
+This feature is thus currently merely here for research purposes and can be accessed by running `python3 TSN_Kozeki --repack <folder name>`.  
+
+
+<br>
+
 #### Why Kozeki?
 Thought it'd made sense to name this script by Ui from a certain epic anime rpg video game since she's capable of restoring something that is nye unreadable to mere mortals such as every single one of us.  
 It is also tradition to name any new project that I'm working on by something Blue Archive related. Kozeki is technically a codename, if you find a better name for this script, feel free to give me suggestions.  
@@ -30,4 +38,4 @@ Also technically a tool already exists [here](https://github.com/TanyanArchitect
 
 <br>
 
-###### TSN_Kozeki © (2025) - Ascellayn | `TSN License 2.1 - Universal`
+###### TSN_Kozeki © (2025-2026) - Ascellayn | TSN License 2.1 - Universal

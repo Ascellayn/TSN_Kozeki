@@ -2,7 +2,7 @@ from TSN_Abstracter import *;
 import re, sys, typing;
 
 Log.Clear();
-Kozeki_Version: str = "v0.5.5";
+Kozeki_Version: str = "v0.6.0";
 Kozeki_Branch: str = "Azure";
 
 
@@ -17,8 +17,8 @@ def Extract_Regex(F: str) -> None:
 	with open(F, "r+b") as Molru: Bytes: bytes = Molru.read();
 	Log.Debug(f"{Molru_Name}: Analyzing...");
 	Extract: typing.Iterator[re.Match[bytes]] | None = re.finditer(b"""
-		(\xFF\xD8....\x4A\x46\x49\x46.+?\xFF\xD9)|			# JFIF (Group 1)
-		(\x4F\x67\x67\x53)|									# OGG (Group 2)
+		(\xFF\xD8...w.\x4A\x46\x49\x46.+?\xFF\xD9)|			# JFIF (Group 1)
+		(\x4F\x67\x67\x53)|									Log# OGG (Group 2)
 		(\x89\x50\x4E\x47.+?(?:\x49\x45\x4E\x44)....)	# PNG (Group 3)
 	""", Bytes, re.DOTALL + re.VERBOSE);
 	Log.Awaited().OK();
@@ -108,7 +108,7 @@ def Extract_Regex(F: str) -> None:
 
 
 
-def Kozeki(Extractor: str) -> None:
+def Kozeki_Extractor(Extractor: str) -> None:
 	if (not File.Exists("BlueArchive_Data")): Log.Critical("The \"BlueArchive_Data\" folder was not found! Quitting."); exit();
 
 	Tree: File.Folder_Tree = File.Tree("BlueArchive_Data");
@@ -132,6 +132,25 @@ def Kozeki(Extractor: str) -> None:
 
 
 
+def Kozeki_Repacker(Repacked_Folder: str) -> None:
+	Log.Critical(f"The Kozeki Repacker currently does not create Molru files that can be loaded by Blue Archive.\nWe currently do not know how the Molru headers from Hex 0x04 to 0x34 work, which in turn, as likely a checksum is present, makes the game refuse to load properly the Molru file even if you bypass the \"Abnormal Client Detected\" message.\nThis feature is thus currently merely here for research purposes as of Kozeki v{Kozeki_Version}.")
+	if (not File.Exists(Repacked_Folder)): Log.Critical(f"The \"{Repacked_Folder}\" folder was not found! Quitting."); exit();
+
+	Buffer: bytes = b""; Repacked_Name: str = Repacked_Folder.split("/")[-1];
+	Folder: File.Folder_Contents = File.List(Repacked_Folder);
+
+
+	Log.Info(f"Repacking {Repacked_Name} containing {len(Folder[1])} files...");
+	for Count, Data in enumerate(sorted(Folder[1])):
+		Log.Debug(f"Reading: {Data}");
+		with open(f"{Repacked_Folder}/{Data}", "r+b") as Data_Raw: Buffer += Data_Raw.read();
+		Log.Carriage(f"Processed {Count+1}/{len(Folder[1])} Files");
+	Log.Debug(f"Molru file of {len(Buffer)} Bytes in size.");
+	
+	with open(f"{Repacked_Name}.molru", "w+b") as Data: Data.write(Buffer);
+	Log.Awaited().OK();
+
+
 
 
 
@@ -146,6 +165,7 @@ def Help():
 	print("python3 ./TSN_Kozeki.py -d --extractor slow");
 	print("");
 	print("A TSNA based tool to extract Blue Archive's .molru PC files, a cursed file type given to us who like to poke around a bit too much.");
+	print("When running without any arguments, by defaults extracts every Molru file found in the BlueArchive_Data directory.");
 	print("");
 	print("Options");
 	print("\t-h\t\t\t= Print usage information and exit.");
@@ -192,7 +212,8 @@ if (__name__ == '__main__'):
 	Config.Logger.Print_Level = 15 if (Debug_Mode) else 20; # type: ignore | > I SAID ITS GONNA BE ALRIGHT
 	Config.Logger.File = False;
 
-	Kozeki(Extractor);
+	if (not Repack_Folder): Kozeki_Extractor(Extractor);
+	else: Kozeki_Repacker(Repack_Folder);
 
 else: TSN_Abstracter.Require_Version((5,4,0));
 # ↑ In case someone wants to import this file and use its extractors outside of the Kozeki script.
