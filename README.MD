@@ -25,7 +25,7 @@ A future update will introduce partial multi-threading as a desperate attempt to
 
 ## Repacking (Editing / Creating Molru Files)
 The Kozeki Repacker currently does not create Molru files that can be loaded by Blue Archive.  
-nWe currently do not know how the Molru headers from Hex 0x04 to 0x34 work, which in turn, as likely a checksum is present, makes the game refuse to load properly the Molru file even if you bypass the "Abnormal Client Detected" message.  
+We currently do not know how the Molru headers from Hex 0x04 to 0x34 work, which in turn, as likely a checksum is present, makes the game refuse to load properly the Molru file even if you bypass the "Abnormal Client Detected" message.  
 This feature is thus currently merely here for research purposes and can be accessed by running `python3 TSN_Kozeki --repack <folder name>`.  
 
 
