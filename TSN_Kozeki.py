@@ -2,8 +2,79 @@ from TSN_Abstracter import *;
 import re, sys, typing;
 
 Log.Clear();
-Kozeki_Version: str = "v0.6.0";
+Kozeki_Version: str = "v0.7.0";
 Kozeki_Branch: str = "Azure";
+
+
+MXMC_Dictionary: dict[str | int, list[tuple[str, str, str, str]]] = {};
+def MX_MediaCatalog() -> None:
+	""" The MX Media Catalogue (MXMC) is a .bytes file containing the internal name of a file and its path.
+	We use the MXMC to rename our extracted files to their actual names. This function is currently slow and will be rewritten to maybe use Regex in the future for blazing fast processing."""
+	# Hardcoded path for now because quite frankly the only file we need to deal with at the moment.
+	global MXMC_Dictionary;
+
+	MXMC_Init: int = Time.Get_Unix(True); MXMC_Progress: int = MXMC_Init;
+	Buffer_Internal: bytes = b""; Buffer_External: bytes = b""; Key: str;
+	Internal: bool = True;
+
+	with open("BlueArchive_Data/StreamingAssets/PUB/Resource/Catalog/MediaResources/MediaCatalog.bytes", "r+b") as NCB: MXMC_Data: bytes = NCB.read();
+
+	MXMC_Dictionary["__Version"] = MXMC_Data[1] + MXMC_Data[2]; # pyright: ignore[reportArgumentType] // stfu
+	MXMC_Data = MXMC_Data[13:]; # We don't care about the header nor the "Internal/Unknown" 64 bits value.
+	MXMC_Total: int = len(MXMC_Data);
+
+	Log.Info(f"Need to process a total of {len(MXMC_Data)} Bytes; MXMC Version \"{MXMC_Dictionary["__Version"]}\" ");
+
+	if (File.Exists("MXMC_Definitions.cjson")):
+		MXMC_Cached: dict[str | int, typing.Any] = File.JSON_Read("MXMC_Definitions.cjson", True);
+		if (MXMC_Cached["__Version"] == MXMC_Dictionary["__Version"]):
+			Log.Info(f"Cached MXMC Definitions Cache found and versions match, avoiding re-discovering everything.");
+			MXMC_Dictionary = MXMC_Cached;
+			return;
+		else: Log.Warning(f"An MXMC Definitions Cache was found but is outdated! Will need to rediscover... (Expected {MXMC_Dictionary["__Version"]}, got {MXMC_Cached["__Version"]})");
+	else: Log.Warning(f"No MXMC Definitions Cache was found, discovering file names...");
+	Log.Stateless("Kozeki will now attempt to parse every single Filename that Blue Archive uses inside the BlueArchive_Data/StreamingAssets/ folder.\nThis is used so that exported data from Molru files have proper file names instead of their raw hex positions. This will take unfortunately a while, please be patient.");
+
+	while (True):
+		Byte: bytes = MXMC_Data[0:1];
+		if (Byte in [b"\x03", b"\x02", b"\x01"]): # 0x03 = GameData // 0x02 = Preload // 0x01 = Root
+			MXMC_Data = MXMC_Data[9:];
+			if (Internal): Internal = False; continue;
+
+			match Byte:
+				case b"\x03": Key_Pre: str = "BlueArchive_Data/StreamingAssets/PUB/Resource/GameData/MediaResources/";
+				case b"\x02": Key_Pre: str = "BlueArchive_Data/StreamingAssets/PUB/Resource/Preload/MediaResources/";
+				case b"\x01": Key_Pre: str = "BlueArchive_Data/StreamingAssets/";
+				case _:
+					Log.Critical(f"John Nexon added a new Folder ID to the MXMC File Format, please notify Ascellayn to go coin himself in THE FINALS.\nKozeki will now close to prevent bad extractions. And by close we mean crashin-");
+					raise Exception(Byte);
+
+			Key = Key_Pre + "/".join(str(Buffer_External, "ASCII").split("/")[:-1]);
+			if (Key not in MXMC_Dictionary.keys()): MXMC_Dictionary[Key] = [];
+			MXMC_Dictionary[Key].append((str(Buffer_Internal, "ASCII"), str(Buffer_External, "ASCII"), str(Buffer_Internal, "ASCII").split("/")[-1], str(Buffer_External, "ASCII").split("/")[-1]));
+			Buffer_External = b""; Buffer_Internal = b""; Internal = True;
+
+			Log.Debug(f"Discovered {MXMC_Dictionary[Key][-1][3]} in {Key} // {len(MXMC_Data)} Bytes left to process");
+			if (len(MXMC_Data) < 4): break;
+			MXMC_Data = MXMC_Data[7:];
+
+			if ((Time.Get_Unix() - MXMC_Progress) > 1):
+				Log.Carriage(f"MX Catalog Parsing → {MXMC_Total - len(MXMC_Data)}/{MXMC_Total} ({round(((MXMC_Total - len(MXMC_Data))/MXMC_Total)*100, 2)}%) Bytes Processed");
+				MXMC_Progress = Time.Get_Unix();
+
+
+		else:
+			if (Internal): Buffer_Internal += Byte;
+			else: Buffer_External += Byte;
+			MXMC_Data = MXMC_Data[1:];
+	Log.Awaited().Status_Update(f"[OK: {len(MXMC_Dictionary.keys())} File Definitions Found]")
+
+	Log.Info(f"Writing Cached MXMC cJSON...");
+	File.JSON_Write("MXMC_Definitions.cjson", MXMC_Dictionary, True);
+	Log.Awaited().OK();
+
+
+
 
 
 
@@ -17,12 +88,13 @@ def Extract_Regex(F: str) -> None:
 	with open(F, "r+b") as Molru: Bytes: bytes = Molru.read();
 	Log.Debug(f"{Molru_Name}: Analyzing...");
 	Extract: typing.Iterator[re.Match[bytes]] | None = re.finditer(b"""
-		(\xFF\xD8...w.\x4A\x46\x49\x46.+?\xFF\xD9)|			# JFIF (Group 1)
-		(\x4F\x67\x67\x53)|									Log# OGG (Group 2)
+		(\xFF\xD8....\x4A\x46\x49\x46.+?\xFF\xD9)|		# JFIF (Group 1)
+		(\x4F\x67\x67\x53)|								# OGG (Group 2)
 		(\x89\x50\x4E\x47.+?(?:\x49\x45\x4E\x44)....)	# PNG (Group 3)
 	""", Bytes, re.DOTALL + re.VERBOSE);
 	Log.Awaited().OK();
-
+	#Log.Debug(f"Found {len(list(Extract)) if (Extract) else 0} Chunks of data");
+	# ↑ Uncommenting this causes Tchernobyl and breaks the extractor, so please don't do it.
 
 
 
@@ -36,8 +108,20 @@ def Extract_Regex(F: str) -> None:
 
 
 	def Write_Data(Type: str, Extension: str, Start: int, End: int) -> None:
-		Log.Stateless(f"{Molru_Name}: {Type} of {End - Start} Bytes @ 0x{String.Trailing_Zero(Start, Trailing_Zeros)}-0x{String.Trailing_Zero(End, Trailing_Zeros)}");
-		with open(f"Extracted/{F.replace(".molru", "")}/0x{String.Trailing_Zero(Start, Trailing_Zeros)}-0x{String.Trailing_Zero(End, Trailing_Zeros)}.{Extension}", "w+b") as Data: Data.write(Bytes[Start:End]);
+		Molru_Path: str = F.replace(".molru", "");
+
+		MXMC_Definitions: tuple[str, str, str, str] | None = None;
+		File_Name: str | None = None;
+		if (Molru_Path in MXMC_Dictionary.keys()):
+			if (len(MXMC_Dictionary[Molru_Path]) != 0):
+				MXMC_Definitions = MXMC_Dictionary[Molru_Path].pop(0);
+				File_Name = MXMC_Definitions[3];
+
+		if (not File_Name):
+			File_Name = f"0x{String.Trailing_Zero(Start, Trailing_Zeros)}-0x{String.Trailing_Zero(End, Trailing_Zeros)}.{Extension}";
+
+		Log.Stateless(f"{Molru_Name}: {Type} of {End - Start} Bytes @ 0x{String.Trailing_Zero(Start, Trailing_Zeros)}-0x{String.Trailing_Zero(End, Trailing_Zeros)} // \"{File_Name}\"");
+		with open(f"Extracted/{F.replace(".molru", "")}/{File_Name}", "w+b") as Data: Data.write(Bytes[Start:End]);
 
 
 
@@ -97,7 +181,8 @@ def Extract_Regex(F: str) -> None:
 
 	# Catch unknown data at the end of files
 	if (Offset != len(Bytes)): Write_Unknown(Offset);
-	Log.Info(f"{F}: Finished Processing in {Time.Elapsed_String(Time.Get_Unix(True) - Molru_Init, " ", Show_Until=-3)}");
+	Log.Stateless(f"{F}: Finished Processing in {Time.Elapsed_String(Time.Get_Unix(True) - Molru_Init, " ", Show_Until=-3)}");
+	#exit();
 
 
 
@@ -173,6 +258,7 @@ def Help():
 	print("");
 	print("\t--extractor <extractor>\t= Enforce an extraction method. Available ones are: 'regex'. (default: 'regex').");
 	print("\t--repack <folder>\t= The folder containing the data we wish to repack as a Molru file.");
+	#print("\t--skip-mxmc \t= Do not use the MXMC Definitions System, recommended on Windows where generating it is stupid slow.");
 
 
 if (__name__ == '__main__'):
@@ -212,6 +298,7 @@ if (__name__ == '__main__'):
 	Config.Logger.Print_Level = 15 if (Debug_Mode) else 20; # type: ignore | > I SAID ITS GONNA BE ALRIGHT
 	Config.Logger.File = False;
 
+	MX_MediaCatalog();
 	if (not Repack_Folder): Kozeki_Extractor(Extractor);
 	else: Kozeki_Repacker(Repack_Folder);
 
