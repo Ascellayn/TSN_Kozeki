@@ -2,14 +2,16 @@ from TSN_Abstracter import *;
 import re, sys, typing;
 
 Log.Clear();
-Kozeki_Version: str = "v0.7.0";
+Kozeki_Version: str = "v0.7.1";
 Kozeki_Branch: str = "Azure";
 
-
+MXMC_Disabled: bool = False;
 MXMC_Dictionary: dict[str | int, list[tuple[str, str, str, str]]] = {};
 def MX_MediaCatalog() -> None:
 	""" The MX Media Catalogue (MXMC) is a .bytes file containing the internal name of a file and its path.
 	We use the MXMC to rename our extracted files to their actual names. This function is currently slow and will be rewritten to maybe use Regex in the future for blazing fast processing."""
+	if (MXMC_Disabled): return;
+
 	# Hardcoded path for now because quite frankly the only file we need to deal with at the moment.
 	global MXMC_Dictionary;
 
@@ -258,7 +260,7 @@ def Help():
 	print("");
 	print("\t--extractor <extractor>\t= Enforce an extraction method. Available ones are: 'regex'. (default: 'regex').");
 	print("\t--repack <folder>\t= The folder containing the data we wish to repack as a Molru file.");
-	#print("\t--skip-mxmc \t= Do not use the MXMC Definitions System, recommended on Windows where generating it is stupid slow.");
+	print("\t--skip-mxmc \t= Do not use the MXMC Definitions System, recommended on Windows where generating it is stupid slow.");
 
 
 if (__name__ == '__main__'):
@@ -282,6 +284,7 @@ if (__name__ == '__main__'):
 					case "--extractor": Extractor = sys.argv.pop(1);
 					case "--repack": Repack_Folder = sys.argv.pop(1);
 					case "-d": Debug_Mode = True; print("== DEBUG MODE ENABLED ==");
+					case "--skip-mxmc": MXMC_Disabled = True;
 					case _: raise Exception(f"Unknown argument: {Argument}");
 				sys.argv.pop(0);
 
