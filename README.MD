@@ -23,7 +23,7 @@ Kozeki will in the future be able to recreate from scratch `.molru` files, altho
 
 1. Download [TSN_Kozeki.py](https://raw.githubusercontent.com/Ascellayn/TSN_Kozeki/refs/heads/main/TSN_Kozeki.py)  
 And place the file at the root of your Blue Archive Folder (the one containing the Blue Archive Executable).
-2. You may download [MXMC_Definitions.cjson](https://raw.githubusercontent.com/Ascellayn/TSN_Kozeki/refs/heads/main/MXMC_Definitions.json)  
+2. You may download [MXMC_Definitions.cjson](https://raw.githubusercontent.com/Ascellayn/TSN_Kozeki/refs/heads/main/MXMC_Definitions.cjson)  
 If generating the File Name DefinitMXMC_Disabledions is taking too long. (If you're on Windows, DO THIS!)
 3. Install [TSN Abstracter](https://github.com/Ascellayn/TSN_Abstracter)  
 You can simply just drag and drop the `TSN_Abstracter` folder where `TSN_Kozeki.py` is located.  
@@ -66,7 +66,7 @@ This feature is thus currently merely here **for research purposes** and can be 
 What I call "MXMC" is a file format that is quite odd, it's located under `BlueArchive_Data/StreamingAssets/PUB/Resource/Catalog` and seemingly holds every file name and their internally referenced names in the game.  
 It's under a `.bytes` format and doesn't contain a readable file header, however I've decided to name it "MXMC" as it's likely obviously made by MX Studios and since it's a Catalog of... Media. It's right in the directory name really.  
 It might be a temporary solution to Molru files not having a file name when extracting Molru files as **the iOS build of the game has a completely different one** (while having the same data) ***and transplanting it into the PC version seemed to cause absolutely zero issues***. With the way Kozeki handles this file and how the file is structured, it's not unlikely that if Nexon decides to combat Kozeki that we'll loose this feature forever. Fingers crossed we'll be fine.  
-Kozeki by default generates a `MXMC_Definitions.cjson` file which is **a 7z compressed JSON file**. You can decompress it using TSN Abstracter's `File.JSON_Read("MXMC_Definitions.cjson", True)` or you can just not bother and check the published decompressed file on this repository at [Research/MXMC_Definitions.json](https://raw.githubusercontent.com/Ascellayn/TSN_Kozeki/refs/heads/main/Research/MXMC_Definitions.cjson).
+Kozeki by default generates a `MXMC_Definitions.cjson` file which is **a 7z compressed JSON file**. You can decompress it using TSN Abstracter's `File.JSON_Read("MXMC_Definitions.cjson", True)` or you can just not bother and check the published decompressed file on this repository at [Research/MXMC_Definitions.json](https://raw.githubusercontent.com/Ascellayn/TSN_Kozeki/refs/heads/main/Research/MXMC_Definitions.json).
 
 <br>
 
