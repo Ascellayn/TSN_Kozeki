@@ -24,7 +24,7 @@ Kozeki will in the future be able to recreate from scratch `.molru` files, altho
 1. Download [TSN_Kozeki.py](https://raw.githubusercontent.com/Ascellayn/TSN_Kozeki/refs/heads/main/TSN_Kozeki.py)  
 And place the file at the root of your Blue Archive Folder (the one containing the Blue Archive Executable).
 2. You may download [MXMC_Definitions.cjson](https://raw.githubusercontent.com/Ascellayn/TSN_Kozeki/refs/heads/main/MXMC_Definitions.cjson)  
-If generating the File Name DefinitMXMC_Disabledions is taking too long. (If you're on Windows, DO THIS!)
+If generating the File Name Definitions is taking too long. (If you're on Windows, DO THIS!)
 3. Install [TSN Abstracter](https://github.com/Ascellayn/TSN_Abstracter)  
 You can simply just drag and drop the `TSN_Abstracter` folder where `TSN_Kozeki.py` is located.  
 Or if you're more advanced, clone the TSNA repository and add the cloned folder to your `PYTHONPATH`.
