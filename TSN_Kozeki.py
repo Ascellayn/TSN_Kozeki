@@ -2,11 +2,13 @@ from TSN_Abstracter import *;
 import re, sys, typing;
 
 Log.Clear();
-Kozeki_Version: str = "v0.7.1";
+Kozeki_Version: str = "v0.7.2";
 Kozeki_Branch: str = "Azure";
 
+MXMC_Only: bool = False;
 MXMC_Disabled: bool = False;
 MXMC_Dictionary: dict[str | int, list[tuple[str, str, str, str]]] = {};
+
 def MX_MediaCatalog() -> None:
 	""" The MX Media Catalogue (MXMC) is a .bytes file containing the internal name of a file and its path.
 	We use the MXMC to rename our extracted files to their actual names. This function is currently slow and will be rewritten to maybe use Regex in the future for blazing fast processing."""
@@ -261,7 +263,7 @@ def Help():
 	print("\t--extractor <extractor>\t= Enforce an extraction method. Available ones are: 'regex'. (default: 'regex').");
 	print("\t--repack <folder>\t= The folder containing the data we wish to repack as a Molru file.");
 	print("\t--skip-mxmc \t= Do not use the MXMC Definitions System, recommended on Windows where generating it is stupid slow.");
-
+	print("\t--only-mxmc \t= Only execute Kozeki to generate a MXMC Definitions Cache, used for Data Research. Also saves an uncompressed version.");
 
 if (__name__ == '__main__'):
 	Log.Stateless(f"Kozeki {Kozeki_Branch} - {Kozeki_Version} © Ascellayn (2025) // TSN License 2.1 - Universal");
@@ -285,6 +287,7 @@ if (__name__ == '__main__'):
 					case "--repack": Repack_Folder = sys.argv.pop(1);
 					case "-d": Debug_Mode = True; print("== DEBUG MODE ENABLED ==");
 					case "--skip-mxmc": MXMC_Disabled = True;
+					case "--only-mxmc": MXMC_Disabled = False; MXMC_Only = True;
 					case _: raise Exception(f"Unknown argument: {Argument}");
 				sys.argv.pop(0);
 
@@ -302,8 +305,10 @@ if (__name__ == '__main__'):
 	Config.Logger.File = False;
 
 	MX_MediaCatalog();
-	if (not Repack_Folder): Kozeki_Extractor(Extractor);
-	else: Kozeki_Repacker(Repack_Folder);
+	if (not MXMC_Only):
+		if (not Repack_Folder): Kozeki_Extractor(Extractor);
+		else: Kozeki_Repacker(Repack_Folder);
+	else: File.JSON_Write("MXMC_Definitions.json", File.JSON_Read("MXMC_Definitions.cjson", True), False);
 
 else: TSN_Abstracter.Require_Version((5,4,0));
 # ↑ In case someone wants to import this file and use its extractors outside of the Kozeki script.
