@@ -44,7 +44,17 @@ Or if you're more advanced, clone the TSNA repository and add the cloned folder 
 <br>
 
 4. Run `python3 TSN_Kozeki.py` in your favorite terminal and watch it go!  
-You may run `python3 TSN_Kozeki.py -h` to get a list of arguments.  
+You may run `python3 TSN_Kozeki.py -h` to get a list of the following arguments:  
+```
+Options
+	-h			= Print usage information and exit.
+	-d			= Enable Debug Mode.
+
+	--extractor <extractor>	= Enforce an extraction method. Available ones are: 'regex'. (default: 'regex').
+	--repack <folder>	= The folder containing the data we wish to repack as a Molru file.
+	--skip-mxmc 	= Do not use the MXMC Definitions System, recommended on Windows where generating it is stupid slow.
+	--only-mxmc 	= Only execute Kozeki to generate a MXMC Definitions Cache, used for Data Research. Also saves an uncompressed version.
+```
 
 <br>
 
