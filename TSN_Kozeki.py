@@ -283,12 +283,12 @@ def Help():
 	print("Options");
 	print("\t-h\t\t\t= Print usage information and exit.");
 	print("\t-d\t\t\t= Enable Debug Mode.");
-	print("\t--limit-logs\t\t\t= Disable showing which files are extracted, improves performance significantly.");
+	print("\t--limit-logs\t\t= Disable showing which files are extracted, improves performance significantly.");
 	print("");
 	print("\t--extractor <extractor>\t= Enforce an extraction method. Available ones are: 'regex'. (default: 'regex').");
 	print("\t--repack <folder>\t= The folder containing the data we wish to repack as a Molru file.");
-	print("\t--skip-mxmc \t= Do not use the MXMC Definitions System, recommended on Windows where generating it is stupid slow.");
-	print("\t--only-mxmc \t= Only execute Kozeki to generate a MXMC Definitions Cache, used for Data Research. Also saves an uncompressed version.");
+	print("\t--skip-mxmc \t\t= Do not use the MXMC Definitions System, recommended on Windows where generating it is stupid slow.");
+	print("\t--only-mxmc \t\t= Only execute Kozeki to generate a MXMC Definitions Cache, used for Data Research. Also saves an uncompressed version.");
 
 if (__name__ == '__main__'):
 	Log.Stateless(f"Kozeki {Kozeki_Branch} - {Kozeki_Version} © Ascellayn (2025) // TSN License 2.1 - Universal");
