@@ -2,8 +2,10 @@ from TSN_Abstracter import *;
 import re, sys, typing;
 
 Log.Clear();
-Kozeki_Version: str = "v0.7.2";
+Kozeki_Version: str = "v0.8.0";
 Kozeki_Branch: str = "Azure";
+
+Limit_Logs: bool = False;
 
 MXMC_Only: bool = False;
 MXMC_Disabled: bool = False;
@@ -91,11 +93,30 @@ def Extract_Regex(F: str) -> None:
 
 	with open(F, "r+b") as Molru: Bytes: bytes = Molru.read();
 	Log.Debug(f"{Molru_Name}: Analyzing...");
+
+
+	# Mental Illness
 	Extract: typing.Iterator[re.Match[bytes]] | None = re.finditer(b"""
-		(\xFF\xD8....\x4A\x46\x49\x46.+?\xFF\xD9)|		# JFIF (Group 1)
+		(\xFF\xD8....									# JPEG (Group 1)
+			(?:												# Signatures
+				\x4A\x46\x49\x46|							# JFIF
+				\x45\x78\x69\x66|							# EXIF
+				\x49\x43\x43\x5F|							# XICC
+				\x00\x01\x01\x01							# RAW
+			)
+			.+?\xFF\xD9 									# JPEG End of Data
+			(?:\xFF\xED.+?\xFF\xD9)? 							# Photoshop Meta
+			(?:\xFF\xE1.+?\xFF\xD9)? 							# Adobe XMP
+			(?:\x38\x42\x49\x4D.+?\xFF\xD9)?					# 8BIM Meta
+			(?:\x00\x38\x42\x49\x4D.+?\xFF\xD9)?				# 8BIM Meta (with an extra Byte 00 byte before because FUCK YOU I GUESS)
+			(?:\xFF\xDB\x00\x43\x00\x03\x02\x02.+?\xFF\xD9)?	# There is a singular file that is beyond fucked and requires this extra check to correctly form the data. It'd require rewriting the whole way I deal with JPEGs so have this janky shit instead
+		)|
 		(\x4F\x67\x67\x53)|								# OGG (Group 2)
 		(\x89\x50\x4E\x47.+?(?:\x49\x45\x4E\x44)....)	# PNG (Group 3)
 	""", Bytes, re.DOTALL + re.VERBOSE);
+	# If the JFIF/EXIF Regex looks so retarded, blame Adobe. No seriously. Well it's just metadata bullshit in general.
+
+
 	Log.Awaited().OK();
 	#Log.Debug(f"Found {len(list(Extract)) if (Extract) else 0} Chunks of data");
 	# ↑ Uncommenting this causes Tchernobyl and breaks the extractor, so please don't do it.
@@ -124,7 +145,7 @@ def Extract_Regex(F: str) -> None:
 		if (not File_Name):
 			File_Name = f"0x{String.Trailing_Zero(Start, Trailing_Zeros)}-0x{String.Trailing_Zero(End, Trailing_Zeros)}.{Extension}";
 
-		Log.Stateless(f"{Molru_Name}: {Type} of {End - Start} Bytes @ 0x{String.Trailing_Zero(Start, Trailing_Zeros)}-0x{String.Trailing_Zero(End, Trailing_Zeros)} // \"{File_Name}\"");
+		if (not Limit_Logs): Log.Stateless(f"{Molru_Name}: {Type} of {End - Start} Bytes @ 0x{String.Trailing_Zero(Start, Trailing_Zeros)}-0x{String.Trailing_Zero(End, Trailing_Zeros)} // \"{File_Name}\"");
 		with open(f"Extracted/{F.replace(".molru", "")}/{File_Name}", "w+b") as Data: Data.write(Bytes[Start:End]);
 
 
@@ -138,13 +159,16 @@ def Extract_Regex(F: str) -> None:
 
 	def Found(Indexes: tuple[int, int]) -> bool: return False if (Indexes == (-1, -1)) else True;
 	for Match in Extract:
-		if (Found(Match.span(1))): # JFIF
+		if (Found(Match.span(1))): # JFIF / EXIF
 			Start: int = Match.span(1)[0]; End: int = Match.span(1)[1];
-			Write_Data("JFIF", "jpeg", Start, End);
+			match (Bytes[Start+3:Start+4]):
+				case b"\xE0": Write_Data("JFIF", "JFIF.jpg", Start, End);
+				case b"\xE1": Write_Data("EXIF", "EXIF.jpg", Start, End);
+				case b"\xE2": Write_Data("XICC JPEG", "XICC.jpg", Start, End);
+				case b"\xDB": Write_Data("RAW JPEG", "RAW.jpg", Start, End);
+				case _: Write_Data("UNKNOWN JPEG", "UNKNOWN.JPEG", Start, End); # Assume it's JPEG RAW if we get here... Though we'll never get here since the regex will fail if it is JPEG Raw.
 			Write_Unknown(Start);
 			Offset = End; continue;
-
-
 
 
 
@@ -251,7 +275,7 @@ def Help():
 	print("Usage");
 	print("");
 	print("python3 ./TSN_Kozeki.py [options]");
-	print("python3 ./TSN_Kozeki.py -d --extractor slow");
+	print("python3 ./TSN_Kozeki.py --limit-logs --extractor regex");
 	print("");
 	print("A TSNA based tool to extract Blue Archive's .molru PC files, a cursed file type given to us who like to poke around a bit too much.");
 	print("When running without any arguments, by defaults extracts every Molru file found in the BlueArchive_Data directory.");
@@ -259,6 +283,7 @@ def Help():
 	print("Options");
 	print("\t-h\t\t\t= Print usage information and exit.");
 	print("\t-d\t\t\t= Enable Debug Mode.");
+	print("\t--limit-logs\t\t\t= Disable showing which files are extracted, improves performance significantly.");
 	print("");
 	print("\t--extractor <extractor>\t= Enforce an extraction method. Available ones are: 'regex'. (default: 'regex').");
 	print("\t--repack <folder>\t= The folder containing the data we wish to repack as a Molru file.");
@@ -281,14 +306,15 @@ if (__name__ == '__main__'):
 			Help(); exit();
 
 		try:
-			for Argument in sys.argv:
-				match Argument:
+			while (sys.argv):
+				match (sys.argv[0]):
 					case "--extractor": Extractor = sys.argv.pop(1);
 					case "--repack": Repack_Folder = sys.argv.pop(1);
 					case "-d": Debug_Mode = True; print("== DEBUG MODE ENABLED ==");
 					case "--skip-mxmc": MXMC_Disabled = True;
 					case "--only-mxmc": MXMC_Disabled = False; MXMC_Only = True;
-					case _: raise Exception(f"Unknown argument: {Argument}");
+					case "--limit-logs": Limit_Logs = True;
+					case _: raise Exception(f"Unknown argument: {sys.argv[0]}");
 				sys.argv.pop(0);
 
 		except Exception as Except:
