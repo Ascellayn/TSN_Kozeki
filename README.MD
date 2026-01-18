@@ -34,8 +34,10 @@ Or if you're more advanced, clone the TSNA repository and add the cloned folder 
 ##### You should end up with a similar looking file structure:
 ```
  BlueArchive/ (→ Your game folder)
-	|-  BlueArchive_Data
-	|-  TSN_Abstracter
+	|-  BlueArchive_Data/
+	|-  TSN_Abstracter/
+		|- __init__.py
+		|- ...
 	|-  BlueArchive.exe
 	|-  TSN_Kozeki.py
 	\-> MXMC_Definitions.cjson (→ If you've downloaded this file)
