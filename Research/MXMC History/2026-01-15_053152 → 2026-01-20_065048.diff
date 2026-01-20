@@ -1,44 +1,129 @@
-320373,320420d
-242816a
-      "audio/voc_kr/kr_yoshimi/yoshimi_formation_select",
-      "Audio/VOC_KR/KR_Yoshimi/Yoshimi_Formation_Select.ogg",
-      "yoshimi_formation_select",
-      "Yoshimi_Formation_Select.ogg"
-    ],
-    [
-.
-180344a
-      "audio/voc_kr/kr_ch0235/ch0235_formation_select",
-      "Audio/VOC_KR/KR_CH0235/CH0235_Formation_Select.ogg",
-      "ch0235_formation_select",
-      "CH0235_Formation_Select.ogg"
-    ],
-    [
-.
-171168a
-      "audio/voc_kr/kr_ch0210/ch0210_formation_select",
-      "Audio/VOC_KR/KR_CH0210/CH0210_Formation_Select.ogg",
-      "ch0210_formation_select",
-      "CH0210_Formation_Select.ogg"
-    ],
-    [
-.
-153546a
-      "audio/voc_kr/kr_ch0165/ch0165_formation_select",
-      "Audio/VOC_KR/KR_CH0165/CH0165_Formation_Select.ogg",
-      "ch0165_formation_select",
-      "CH0165_Formation_Select.ogg"
-    ],
-    [
-.
-125362a
-      "audio/voc_kr/kr_airi/airi_formation_select",
-      "Audio/VOC_KR/KR_Airi/Airi_Formation_Select.ogg",
-      "airi_formation_select",
-      "Airi_Formation_Select.ogg"
-    ],
-    [
-.
-2c
-  "__Version": 366,
-.
+--- 2026-01-15_053152.json	2026-01-17 10:02:39.700059600 +0100
++++ 2026-01-20_065048.json	2026-01-20 20:27:32.008172600 +0100
+@@ -1,5 +1,5 @@
+ {
+-  "__Version": 369,
++  "__Version": 366,
+   "BlueArchive_Data/StreamingAssets/PUB/Resource/GameData/MediaResources/Audio/BGM": [
+     [
+       "audio/bgm/amb_fire",
+@@ -125360,6 +125360,12 @@
+       "Airi_Formation_In_2.ogg"
+     ],
+     [
++      "audio/voc_kr/kr_airi/airi_formation_select",
++      "Audio/VOC_KR/KR_Airi/Airi_Formation_Select.ogg",
++      "airi_formation_select",
++      "Airi_Formation_Select.ogg"
++    ],
++    [
+       "audio/voc_kr/kr_airi/airi_gachaget",
+       "Audio/VOC_KR/KR_Airi/Airi_Gachaget.ogg",
+       "airi_gachaget",
+@@ -153544,6 +153550,12 @@
+       "CH0165_Formation_In_2.ogg"
+     ],
+     [
++      "audio/voc_kr/kr_ch0165/ch0165_formation_select",
++      "Audio/VOC_KR/KR_CH0165/CH0165_Formation_Select.ogg",
++      "ch0165_formation_select",
++      "CH0165_Formation_Select.ogg"
++    ],
++    [
+       "audio/voc_kr/kr_ch0165/ch0165_gachaget",
+       "Audio/VOC_KR/KR_CH0165/CH0165_Gachaget.ogg",
+       "ch0165_gachaget",
+@@ -171166,6 +171178,12 @@
+       "CH0210_Formation_In_2.ogg"
+     ],
+     [
++      "audio/voc_kr/kr_ch0210/ch0210_formation_select",
++      "Audio/VOC_KR/KR_CH0210/CH0210_Formation_Select.ogg",
++      "ch0210_formation_select",
++      "CH0210_Formation_Select.ogg"
++    ],
++    [
+       "audio/voc_kr/kr_ch0210/ch0210_gachaget",
+       "Audio/VOC_KR/KR_CH0210/CH0210_Gachaget.ogg",
+       "ch0210_gachaget",
+@@ -180342,6 +180360,12 @@
+       "CH0235_Formation_In_2.ogg"
+     ],
+     [
++      "audio/voc_kr/kr_ch0235/ch0235_formation_select",
++      "Audio/VOC_KR/KR_CH0235/CH0235_Formation_Select.ogg",
++      "ch0235_formation_select",
++      "CH0235_Formation_Select.ogg"
++    ],
++    [
+       "audio/voc_kr/kr_ch0235/ch0235_gachaget",
+       "Audio/VOC_KR/KR_CH0235/CH0235_Gachaget.ogg",
+       "ch0235_gachaget",
+@@ -242814,6 +242838,12 @@
+       "Yoshimi_Formation_In_2.ogg"
+     ],
+     [
++      "audio/voc_kr/kr_yoshimi/yoshimi_formation_select",
++      "Audio/VOC_KR/KR_Yoshimi/Yoshimi_Formation_Select.ogg",
++      "yoshimi_formation_select",
++      "Yoshimi_Formation_Select.ogg"
++    ],
++    [
+       "audio/voc_kr/kr_yoshimi/yoshimi_gachaget",
+       "Audio/VOC_KR/KR_Yoshimi/Yoshimi_Gachaget.ogg",
+       "yoshimi_gachaget",
+@@ -320372,54 +320402,6 @@
+       "BattlePass_Banner_250722_1.mp4"
+     ],
+     [
+-      "video/gacha_banner_230117_gb_2",
+-      "Video/Gacha_Banner_230117_gb_2.mp4",
+-      "gacha_banner_230117_gb_2",
+-      "Gacha_Banner_230117_gb_2.mp4"
+-    ],
+-    [
+-      "video/gacha_banner_230801_gb_2",
+-      "Video/Gacha_Banner_230801_gb_2.mp4",
+-      "gacha_banner_230801_gb_2",
+-      "Gacha_Banner_230801_gb_2.mp4"
+-    ],
+-    [
+-      "video/gacha_banner_230822_gb_1",
+-      "Video/Gacha_Banner_230822_gb_1.mp4",
+-      "gacha_banner_230822_gb_1",
+-      "Gacha_Banner_230822_gb_1.mp4"
+-    ],
+-    [
+-      "video/gacha_banner_230822_gb_2",
+-      "Video/Gacha_Banner_230822_gb_2.mp4",
+-      "gacha_banner_230822_gb_2",
+-      "Gacha_Banner_230822_gb_2.mp4"
+-    ],
+-    [
+-      "video/gacha_banner_240123_gb_1",
+-      "Video/Gacha_Banner_240123_gb_1.mp4",
+-      "gacha_banner_240123_gb_1",
+-      "Gacha_Banner_240123_gb_1.mp4"
+-    ],
+-    [
+-      "video/gacha_banner_241224_gb_1",
+-      "Video/Gacha_Banner_241224_gb_1.mp4",
+-      "gacha_banner_241224_gb_1",
+-      "Gacha_Banner_241224_gb_1.mp4"
+-    ],
+-    [
+-      "video/gacha_banner_241224_gb_2",
+-      "Video/Gacha_Banner_241224_gb_2.mp4",
+-      "gacha_banner_241224_gb_2",
+-      "Gacha_Banner_241224_gb_2.mp4"
+-    ],
+-    [
+-      "video/gacha_banner_250513_gb_2",
+-      "Video/Gacha_Banner_250513_gb_2.mp4",
+-      "gacha_banner_250513_gb_2",
+-      "Gacha_Banner_250513_gb_2.mp4"
+-    ],
+-    [
+       "video/gacha_banner_260113_gb_1",
+       "Video/Gacha_Banner_260113_gb_1.mp4",
+       "gacha_banner_260113_gb_1",
