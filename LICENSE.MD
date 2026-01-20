@@ -1,4 +1,4 @@
-## TSN_Kozeki © (2025) - Ascellayn | `TSN License 2.1 - Universal`
+## TSN Kozeki © (2025-2026) - Ascellayn / The Sirio Network | `TSN License 2.1 - Universal`
 
 **__The Sirio Network License 2.1 - Universal__**  
 *https://sirio-network.com/license/2.1 | Published 01/12/2025 at 01:45:46*  

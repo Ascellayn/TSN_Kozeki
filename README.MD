@@ -93,4 +93,4 @@ After bloodshed and tears, I'm happy to announce now that, that previous tool is
 
 <br>
 
-###### [TSN_Kozeki © (2025-2026) - Ascellayn | TSN License 2.1 - Universal](https://sirio-network.com/license/2.1)
+###### [TSN Kozeki © (2025-2026) - Ascellayn / The Sirio Network | TSN License 2.1 - Universal](https://sirio-network.com/license/2.1)

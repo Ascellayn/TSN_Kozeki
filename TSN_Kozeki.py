@@ -2,14 +2,14 @@ from TSN_Abstracter import *;
 import re, sys, typing;
 
 Log.Clear();
-Kozeki_Version: str = "v0.8.0";
+Kozeki_Version: str = "v0.8.1";
 Kozeki_Branch: str = "Azure";
 
 Limit_Logs: bool = False;
 
 MXMC_Only: bool = False;
 MXMC_Disabled: bool = False;
-MXMC_Dictionary: dict[str | int, list[tuple[str, str, str, str]]] = {};
+MXMC_Dictionary: dict[str, list[tuple[str, str, str, str]]] = {};
 
 def MX_MediaCatalog() -> None:
 	""" The MX Media Catalogue (MXMC) is a .bytes file containing the internal name of a file and its path.
@@ -32,7 +32,7 @@ def MX_MediaCatalog() -> None:
 	Log.Info(f"Need to process a total of {len(MXMC_Data)} Bytes; MXMC Version \"{MXMC_Dictionary["__Version"]}\" ");
 
 	if (File.Exists("MXMC_Definitions.cjson")):
-		MXMC_Cached: dict[str | int, typing.Any] = File.JSON_Read("MXMC_Definitions.cjson", True);
+		MXMC_Cached: dict[str, Any] = File.JSON_Read("MXMC_Definitions.cjson", True);
 		if (MXMC_Cached["__Version"] == MXMC_Dictionary["__Version"]):
 			Log.Info(f"Cached MXMC Definitions Cache found and versions match, avoiding re-discovering everything.");
 			MXMC_Dictionary = MXMC_Cached;
@@ -291,10 +291,10 @@ def Help():
 	print("\t--only-mxmc \t\t= Only execute Kozeki to generate a MXMC Definitions Cache, used for Data Research. Also saves an uncompressed version.");
 
 if (__name__ == '__main__'):
-	Log.Stateless(f"Kozeki {Kozeki_Branch} - {Kozeki_Version} © Ascellayn (2025) // TSN License 2.1 - Universal");
+	Log.Stateless(f"Kozeki {Kozeki_Branch} - {Kozeki_Version} © Ascellayn / The Sirio Network (2025-2026) | TSN License 2.1 - Universal");
 	Log.Stateless("Kozeki is a TSNA based tool to extract Blue Archive's .molru PC files, a cursed file type given to us who like to poke around a bit too much.\n");
 	global Debug_Mode; Debug_Mode: bool;
-	TSN_Abstracter.Require_Version((5,4,0));
+	TSN_Abstracter.Require_Version((5,5,0));
 
 	# Argument Configuration
 	Extractor: str = "regex";
@@ -336,5 +336,5 @@ if (__name__ == '__main__'):
 		else: Kozeki_Repacker(Repack_Folder);
 	else: File.JSON_Write("MXMC_Definitions.json", File.JSON_Read("MXMC_Definitions.cjson", True), False);
 
-else: TSN_Abstracter.Require_Version((5,4,0));
+else: TSN_Abstracter.Require_Version((5,5,0));
 # ↑ In case someone wants to import this file and use its extractors outside of the Kozeki script.
