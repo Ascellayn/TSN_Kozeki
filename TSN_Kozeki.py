@@ -2,7 +2,7 @@ from TSN_Abstracter import *;
 import re, sys, typing;
 
 Log.Clear();
-Kozeki_Version: str = "v0.8.1";
+Kozeki_Version: str = "v0.8.2";
 Kozeki_Branch: str = "Azure";
 
 Limit_Logs: bool = False;
@@ -291,10 +291,26 @@ def Help():
 	print("\t--only-mxmc \t\t= Only execute Kozeki to generate a MXMC Definitions Cache, used for Data Research. Also saves an uncompressed version.");
 
 if (__name__ == '__main__'):
-	Log.Stateless(f"Kozeki {Kozeki_Branch} - {Kozeki_Version} © Ascellayn / The Sirio Network (2025-2026) | TSN License 2.1 - Universal");
-	Log.Stateless("Kozeki is a TSNA based tool to extract Blue Archive's .molru PC files, a cursed file type given to us who like to poke around a bit too much.\n");
 	global Debug_Mode; Debug_Mode: bool;
-	TSN_Abstracter.Require_Version((5,5,0));
+
+	if (TSN_Abstracter.Version_Tuple[0] >= 6):
+		# TSNA "Azure" v6+ Compatibility and avoid making users redownload the App.tsna file
+		App.Name = "Kozeki";
+		App.Description = "Kozeki is a TSNA based tool to extract Blue Archive's .molru PC files, a cursed file type given to us who like to poke around a bit too much.";
+		App.Author = ["Ascellayn", "The Sirio Network"];
+		App.License = "TSN License 2.1 - Universal";
+		App.License_Year = "2025-2026";
+		App.Codename = "TSN_Kozeki";
+		App.Branch = "Azure";
+		App.Version = (6,0,0);
+		App.TSNA = (6,0,0);
+
+		TSN_Abstracter.App_Init(False);
+	else:
+		Log.Stateless(f"Kozeki {Kozeki_Branch} - {Kozeki_Version} © Ascellayn / The Sirio Network (2025-2026) | TSN License 2.1 - Universal");
+		Log.Stateless("Kozeki is a TSNA based tool to extract Blue Archive's .molru PC files, a cursed file type given to us who like to poke around a bit too much.\n");
+		TSN_Abstracter.Require_Version((5,5,0));
+		Log.Warning(f"You seem to be using TSN Abstracter 'Everest' (v5.X.X), Kozeki will still function just fine but do note that in the future you may need to download a newer version of TSNA if Kozeki ever needs a newer function from it.");
 
 	# Argument Configuration
 	Extractor: str = "regex";
