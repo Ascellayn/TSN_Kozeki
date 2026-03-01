@@ -1,0 +1,102 @@
+--- 2026-02-10_041453.json	2026-02-11 21:12:02.395567100 +0100
++++ 2026-02-24_042256.json	2026-03-01 22:44:34.816463400 +0100
+@@ -1,5 +1,5 @@
+ {
+-  "__Version": 219,
++  "__Version": 217,
+   "BlueArchive_Data/StreamingAssets/PUB/Resource/GameData/MediaResources/Audio/BGM": [
+     [
+       "audio/bgm/amb_fire",
+@@ -333220,34 +333220,34 @@
+       "BattlePass_Banner_250722_1.mp4"
+     ],
+     [
+-      "video/gacha_banner_220503_gb_1",
+-      "Video/Gacha_Banner_220503_gb_1.mp4",
+-      "gacha_banner_220503_gb_1",
+-      "Gacha_Banner_220503_gb_1.mp4"
++      "video/gacha_banner_220322_gb_1",
++      "Video/Gacha_Banner_220322_gb_1.mp4",
++      "gacha_banner_220322_gb_1",
++      "Gacha_Banner_220322_gb_1.mp4"
+     ],
+     [
+-      "video/gacha_banner_220503_gb_2",
+-      "Video/Gacha_Banner_220503_gb_2.mp4",
+-      "gacha_banner_220503_gb_2",
+-      "Gacha_Banner_220503_gb_2.mp4"
++      "video/gacha_banner_220322_gb_2",
++      "Video/Gacha_Banner_220322_gb_2.mp4",
++      "gacha_banner_220322_gb_2",
++      "Gacha_Banner_220322_gb_2.mp4"
+     ],
+     [
+-      "video/gacha_banner_230411_gb_1",
+-      "Video/Gacha_Banner_230411_gb_1.mp4",
+-      "gacha_banner_230411_gb_1",
+-      "Gacha_Banner_230411_gb_1.mp4"
++      "video/gacha_banner_221101_gb_3",
++      "Video/Gacha_Banner_221101_gb_3.mp4",
++      "gacha_banner_221101_gb_3",
++      "Gacha_Banner_221101_gb_3.mp4"
+     ],
+     [
+-      "video/gacha_banner_250130_gb_1",
+-      "Video/Gacha_Banner_250130_gb_1.mp4",
+-      "gacha_banner_250130_gb_1",
+-      "Gacha_Banner_250130_gb_1.mp4"
++      "video/gacha_banner_230530_gb_1",
++      "Video/Gacha_Banner_230530_gb_1.mp4",
++      "gacha_banner_230530_gb_1",
++      "Gacha_Banner_230530_gb_1.mp4"
+     ],
+     [
+-      "video/gacha_banner_250130_gb_2",
+-      "Video/Gacha_Banner_250130_gb_2.mp4",
+-      "gacha_banner_250130_gb_2",
+-      "Gacha_Banner_250130_gb_2.mp4"
++      "video/gacha_banner_240220_gb_1",
++      "Video/Gacha_Banner_240220_gb_1.mp4",
++      "gacha_banner_240220_gb_1",
++      "Gacha_Banner_240220_gb_1.mp4"
+     ],
+     [
+       "video/gacha_banner_250513_gb_1",
+@@ -333256,24 +333256,6 @@
+       "Gacha_Banner_250513_gb_1.mp4"
+     ],
+     [
+-      "video/gacha_banner_260113_gb_1",
+-      "Video/Gacha_Banner_260113_gb_1.mp4",
+-      "gacha_banner_260113_gb_1",
+-      "Gacha_Banner_260113_gb_1.mp4"
+-    ],
+-    [
+-      "video/gacha_banner_260113_gb_2",
+-      "Video/Gacha_Banner_260113_gb_2.mp4",
+-      "gacha_banner_260113_gb_2",
+-      "Gacha_Banner_260113_gb_2.mp4"
+-    ],
+-    [
+-      "video/gacha_banner_260127_gb_1",
+-      "Video/Gacha_Banner_260127_gb_1.mp4",
+-      "gacha_banner_260127_gb_1",
+-      "Gacha_Banner_260127_gb_1.mp4"
+-    ],
+-    [
+       "video/gacha_banner_260210_gb_1",
+       "Video/Gacha_Banner_260210_gb_1.mp4",
+       "gacha_banner_260210_gb_1",
+@@ -333286,6 +333268,12 @@
+       "Gacha_Banner_260210_gb_2.mp4"
+     ],
+     [
++      "video/gacha_banner_260224_gb_1",
++      "Video/Gacha_Banner_260224_gb_1.mp4",
++      "gacha_banner_260224_gb_1",
++      "Gacha_Banner_260224_gb_1.mp4"
++    ],
++    [
+       "video/gacha_banner_3star_gb_3",
+       "Video/Gacha_Banner_3Star_gb_3.mp4",
+       "gacha_banner_3star_gb_3",
