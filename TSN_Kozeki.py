@@ -1,11 +1,11 @@
 from TSN_Abstracter import *;
-import re, sys, typing;
+import hashlib, re, sys, typing;
 
 
 
 
 
-Limit_Logs: bool = False;
+More_Logs: bool = False;
 
 MXMC_Only: bool = False;
 MXMC_Disabled: bool = False;
@@ -161,7 +161,7 @@ def Extract_Regex(F: str) -> None:
 		if (not File_Name):
 			File_Name = f"0x{String.Trailing_Zero(Start, Trailing_Zeros)}-0x{String.Trailing_Zero(End, Trailing_Zeros)}.{Extension}";
 
-		if (not Limit_Logs): Log.Stateless(f"{Molru_Name}: {Type} of {End - Start} Bytes @ 0x{String.Trailing_Zero(Start, Trailing_Zeros)}-0x{String.Trailing_Zero(End, Trailing_Zeros)} // \"{File_Name}\"");
+		if (More_Logs): Log.Stateless(f"{Molru_Name}: {Type} of {End - Start} Bytes @ 0x{String.Trailing_Zero(Start, Trailing_Zeros)}-0x{String.Trailing_Zero(End, Trailing_Zeros)} // \"{File_Name}\"");
 		with open(f"Extracted/{F.replace(".molru", "")}/{File_Name}", "w+b") as Data: Data.write(Bytes[Start:End]);
 
 
@@ -299,11 +299,11 @@ def Help():
 	print("Options");
 	print("\t-h\t\t\t= Print usage information and exit.");
 	print("\t-d\t\t\t= Enable Debug Mode.");
-	print("\t--limit-logs\t\t= Disable showing which files are extracted, improves performance significantly.");
+	print("\t--more-logs\t\t= Showing which files are being extracted, drastically lowers performance.");
 	print("");
 	print("\t--extractor <extractor>\t= Enforce an extraction method. Available ones are: 'regex'. (default: 'regex').");
 	print("\t--repack <folder>\t= The folder containing the data we wish to repack as a Molru file.");
-	print("\t--skip-mxmc \t\t= Do not use the MXMC Definitions System, recommended on Windows where generating it is stupid slow.");
+	print("\t--skip-mxmc \t\t= Do not use the MXMC Definitions System when extracting files. Files will not have easy to read names.");
 	print("\t--only-mxmc \t\t= Only execute Kozeki to generate a MXMC Definitions Cache, used for Data Research. Also saves an uncompressed version.");
 
 if (__name__ == '__main__'):
@@ -341,7 +341,7 @@ if (__name__ == '__main__'):
 					case "-d": Debug_Mode = True; print("== DEBUG MODE ENABLED ==");
 					case "--skip-mxmc": MXMC_Disabled = True;
 					case "--only-mxmc": MXMC_Disabled = False; MXMC_Only = True;
-					case "--limit-logs": Limit_Logs = True;
+					case "--more-logs": More_Logs = True;
 					case _: raise Exception(f"Unknown argument: {sys.argv[0]}");
 				sys.argv.pop(0);
 
