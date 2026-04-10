@@ -16,8 +16,7 @@ Kozeki will in the future be able to recreate from scratch `.molru` files, altho
 ## Setup
 > [!NOTE]
 > Kozeki is primarily developed (including its dependency TSNA) on Linux.
-> While tests have shown that *compatibility on Windows seems perfect*, on average everything is slower **especially generating the "MXMC" Definitions Cache**.
-> You may wish to download `MXMC_Cache.cjson` too if you have the miss fortune of running Kozeki on Windows, if that cache on the repository is up to date.
+> While tests have shown that *compatibility on Windows seems perfect*, your millage may vary and I will NOT test for it because Windows bad.
 
 <br>
 

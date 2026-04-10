@@ -299,7 +299,7 @@ def Help():
 	print("Options");
 	print("\t-h\t\t\t= Print usage information and exit.");
 	print("\t-d\t\t\t= Enable Debug Mode.");
-	print("\t--more-logs\t\t= Showing which files are being extracted, drastically lowers performance.");
+	print("\t--more-logs\t\t= Show which files are being extracted, drastically lowers performance.");
 	print("");
 	print("\t--extractor <extractor>\t= Enforce an extraction method. Available ones are: 'regex'. (default: 'regex').");
 	print("\t--repack <folder>\t= The folder containing the data we wish to repack as a Molru file.");
