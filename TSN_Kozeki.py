@@ -1,5 +1,6 @@
 from TSN_Abstracter import *;
 import hashlib, re, sys, typing;
+import multiprocessing, os;
 
 
 
@@ -99,7 +100,6 @@ def MX_MediaCatalog() -> None:
 
 
 
-
 def Extract_Regex(F: str) -> None:
 	""" Regex extraction, requires a hefty amount of memory and can be slow for larger files."""
 	Molru_Init: int = Time.Get_Unix(True);
@@ -143,9 +143,8 @@ def Extract_Regex(F: str) -> None:
 	Trailing_Zeros: int = len(str(len(Bytes))); 
 	def Write_Unknown(Start: int) -> None:
 		if (Start - Offset == 0): return;
-		Log.Warning(f"{Molru_Name}: Unknown Hex of {Start - Offset} Bytes @ 0x{String.Trailing_Zero(Offset, Trailing_Zeros)}-0x{String.Trailing_Zero(Start, Trailing_Zeros)}...");
+		Log.Warning(f"{Molru_Name}: Unknown Hex of {Start - Offset} Bytes @ 0x{String.Trailing_Zero(Offset, Trailing_Zeros)}-0x{String.Trailing_Zero(Start, Trailing_Zeros)}");
 		with open(f"Extracted/{F.replace(".molru", "")}/0x{String.Trailing_Zero(Offset, Trailing_Zeros)}-0x{String.Trailing_Zero(Start, Trailing_Zeros)}.hex", "w+b") as Img: Img.write(Bytes[Offset:Start]);
-		Log.Awaited().OK();
 
 
 	def Write_Data(Type: str, Extension: str, Start: int, End: int) -> None:
@@ -225,7 +224,7 @@ def Extract_Regex(F: str) -> None:
 
 	# Catch unknown data at the end of files
 	if (Offset != len(Bytes)): Write_Unknown(Offset);
-	Log.Stateless(f"{F}: Finished Processing in {Time.Elapsed_String(Time.Get_Unix(True) - Molru_Init, " ", Show_Until=-3)}");
+	if (More_Logs): Log.Stateless(f"{F}: Finished Processing in {Time.Elapsed_String(Time.Get_Unix(True) - Molru_Init, " ", Show_Until=-3)}");
 	#exit();
 
 
@@ -241,24 +240,47 @@ def Kozeki_Extractor(Extractor: str) -> None:
 	if (not File.Exists("BlueArchive_Data")): Log.Critical("The \"BlueArchive_Data\" folder was not found! Quitting."); exit();
 
 	Tree: File.Folder_Tree = File.Tree("BlueArchive_Data");
-	def Molru_Recursion(Folder_Matrix: File.Folder_Matrix, Path: str = "BlueArchive_Data/") -> None:
-		def Molru_Files(Files: list[str], Path: str) -> None:
-			for File in Files:
-				if (File.endswith(".molru")):
-					Log.Info(f"Processing Molru \"{Path}{File}\"...");
-					match Extractor.lower():
-						case "regex": Extract_Regex(f"{Path}{File}");
-						case _: raise Exception(f"Unknown Extractor: {Extractor}");
-					Log.Awaited().OK();
+	def Molru_Recursion(Folder_Matrix: File.Folder_Matrix, Path: str = "BlueArchive_Data/", Molrus: set[str] = set()) -> set[str]:
+		def Molru_Files(Files: list[str], Path: str) -> set[str]:
+			sMolrus: set[str] = set();
+			for F in Files:
+				if (F.endswith(".molru")):
+					sMolrus.add(f"{Path}{F}");
+			return sMolrus;
 
 		Path += f"{Folder_Matrix[0]}/"; Log.Debug(Path);
-		Molru_Files(list(Folder_Matrix[1][1]), Path); # this looks cursed to make strict typing happy
+		Molrus.update(Molru_Files(list(Folder_Matrix[1][1]), Path));
 
 		for Folder in Folder_Matrix[1][0]:
-			Molru_Recursion(Folder, Path);
+			Molrus.update(Molru_Recursion(Folder, Path, Molrus));
+		
+		return Molrus;
 
-	for Folder in Tree[0]: Molru_Recursion(Folder);
+	Molrus: set[str] = set();
+	for Folder in Tree[0]:
+		Molrus.update(Molru_Recursion(Folder));
 
+	Log.Info(f"Discovered {len(Molrus)} Molru files, proceeding to extraction.");
+
+	Extract_Init: float = Time.Get_Unix(True);
+
+	with multiprocessing.Pool(Extraction_Threads) as P:
+		match Extractor.lower():
+			case "regex": P.imap_unordered(Extract_Regex, Molrus);
+			case _: raise Exception(f"Unknown Extractor: {Extractor}");
+		P.close(); P.join();
+
+
+	"""
+	for Molru in Molrus:
+		Log.Info(f"Processing Molru \"{Molru}\"...");
+		match Extractor.lower():
+			case "regex": Extract_Regex(Molru);
+			case _: raise Exception(f"Unknown Extractor: {Extractor}");
+		Log.Awaited().OK();
+	"""
+
+	Log.Stateless(f"Extraction finished in {Time.Elapsed_String(Time.Get_Unix(True) - Extract_Init, " ", Show_Until=-3)}.");
 
 
 def Kozeki_Repacker(Repacked_Folder: str) -> None:
@@ -302,6 +324,8 @@ def Help():
 	print("\t--more-logs\t\t= Show which files are being extracted, drastically lowers performance.");
 	print("");
 	print("\t--extractor <extractor>\t= Enforce an extraction method. Available ones are: 'regex'. (default: 'regex').");
+	print("\t-t <threads>\t= Set how many threads Kozeki should use to Extract Molru files. Set this value lower to prevent overloading your device. (default: Maximimum available CPU Cores).");
+	print("");
 	print("\t--repack <folder>\t= The folder containing the data we wish to repack as a Molru file.");
 	print("\t--skip-mxmc \t\t= Do not use the MXMC Definitions System when extracting files. Files will not have easy to read names.");
 	print("\t--only-mxmc \t\t= Only execute Kozeki to generate a MXMC Definitions Cache, used for Data Research. Also saves an uncompressed version.");
@@ -315,7 +339,7 @@ if (__name__ == '__main__'):
 	App.License_Year = "2025-2026";
 	App.Codename = "TSN_Kozeki";
 	App.Branch = "Azure";
-	App.Version = (0,8,3);
+	App.Version = (0,8,4);
 	App.TSNA = (6,0,0);
 
 	TSN_Abstracter.App_Init(False);
@@ -326,6 +350,7 @@ if (__name__ == '__main__'):
 
 	# Argument Configuration
 	Extractor: str = "regex";
+	Extraction_Threads: int = os.process_cpu_count();
 	Repack_Folder: str | None = None;
 
 	if (len(sys.argv) > 1):
@@ -338,6 +363,7 @@ if (__name__ == '__main__'):
 				match (sys.argv[0]):
 					case "--extractor": Extractor = sys.argv.pop(1);
 					case "--repack": Repack_Folder = sys.argv.pop(1);
+					case "-t": Extraction_Threads = int(sys.argv.pop(1));
 					case "-d": Debug_Mode = True; print("== DEBUG MODE ENABLED ==");
 					case "--skip-mxmc": MXMC_Disabled = True;
 					case "--only-mxmc": MXMC_Disabled = False; MXMC_Only = True;
