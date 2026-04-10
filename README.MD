@@ -80,7 +80,7 @@ It's under a `.bytes` format and doesn't contain a readable file header, however
 It might be a temporary solution to Molru files not having a file name when extracting Molru files as **the iOS build of the game has a completely different one** (while having the same data) ***and transplanting it into the PC version seemed to cause absolutely zero issues***. With the way Kozeki handles this file and how the file is structured, it's not unlikely that if Nexon decides to combat Kozeki that we'll loose this feature forever. Fingers crossed we'll be fine.  
 Kozeki by default generates a `MXMC_Definitions.cjson` file which is **a 7z compressed JSON file**. You can decompress it using TSN Abstracter's `File.JSON_Read("MXMC_Definitions.cjson", True)` or you can just not bother and check the published decompressed file on this repository at [Research/MXMC_Definitions.json](https://raw.githubusercontent.com/Ascellayn/TSN_Kozeki/refs/heads/main/Research/MXMC_Definitions.json).  
 
-*Special Thanks to @Apis035, without them Windows users would be crying to this day still. (see #7)*
+*Special Thanks to [@Apis035](https://github.com/Apis035), without them Windows users would be crying to this day still. (see #7)*  
 *The MXMC Cache used to take around 5 minutes on Linux to generate and like 40 minutes on Windows. They helped me by telling me more details on how MXMC works, which helped drastically improving the speed of the MXMC Generator!*
 
 <br>
