@@ -111,6 +111,7 @@ def Extract_Regex(F: str) -> None:
 	Molru_Init: int = Time.Get_Unix(True);
 	
 	Molru_Name: str = F.split("/")[-1];
+	Molru_Path: str = F.replace(".molru", "");
 	File.Path_Require(f"Extracted/{F.replace(".molru", "")}/");
 
 	with open(F, "r+b") as Molru: Bytes: bytes = Molru.read();
@@ -147,15 +148,23 @@ def Extract_Regex(F: str) -> None:
 
 
 	Trailing_Zeros: int = len(str(len(Bytes))); 
-	def Write_Unknown(Start: int) -> None:
-		if (Start - Offset == 0): return;
-		Log.Warning(f"{Molru_Name}: Unknown Hex of {Start - Offset} Bytes @ 0x{String.Trailing_Zero(Offset, Trailing_Zeros)}-0x{String.Trailing_Zero(Start, Trailing_Zeros)}");
-		with open(f"Extracted/{F.replace(".molru", "")}/0x{String.Trailing_Zero(Offset, Trailing_Zeros)}-0x{String.Trailing_Zero(Start, Trailing_Zeros)}.hex", "w+b") as Img: Img.write(Bytes[Offset:Start]);
-
+	def Write_Unknown(Start: int | None) -> None:
+		if (Start):
+			if ((Start - Offset == 0)): return;
+			Log.Warning(f"{Molru_Name}: Hex of {Start - Offset} Bytes @ 0x{String.Trailing_Zero(Offset, Trailing_Zeros)}-0x{String.Trailing_Zero(Start, Trailing_Zeros)}");
+			with open(f"Extracted/{Molru_Path}/0x{String.Trailing_Zero(Offset, Trailing_Zeros)}-0x{String.Trailing_Zero(Start, Trailing_Zeros)}.hex", "w+b") as Data:
+				Data.write(Bytes[Offset:Start]);
+		else: # Flush the entire rest of the file if Start is None
+			if (len(MXMC_Dictionary[Molru_Path]) == 1):
+				Log.Warning(f"MXMC Failsafe: {MXMC_Dictionary[Molru_Path][-1][1]}");
+				with open(f"Extracted/{Molru_Path}/{MXMC_Dictionary[Molru_Path].pop(0)[3]}", "w+b") as Data:
+					Data.write(Bytes[Offset:]);
+			else:
+				Log.Warning(f"{Molru_Name}: EOF Hex of {len(Bytes) - Offset} Bytes @ 0x{String.Trailing_Zero(Offset, Trailing_Zeros)}-0x{String.Trailing_Zero(len(Bytes), Trailing_Zeros)}");
+				with open(f"Extracted/{Molru_Path}/0x{String.Trailing_Zero(Offset, Trailing_Zeros)}-0x{String.Trailing_Zero(len(Bytes), Trailing_Zeros)}.hex", "w+b") as Data:
+					Data.write(Bytes[Offset:]);
 
 	def Write_Data(Type: str, Extension: str, Start: int, End: int) -> None:
-		Molru_Path: str = F.replace(".molru", "");
-
 		MXMC_Definitions: tuple[str, str, str, str] | None = None;
 		File_Name: str | None = None;
 		if (Molru_Path in MXMC_Dictionary.keys()):
@@ -167,7 +176,7 @@ def Extract_Regex(F: str) -> None:
 			File_Name = f"0x{String.Trailing_Zero(Start, Trailing_Zeros)}-0x{String.Trailing_Zero(End, Trailing_Zeros)}.{Extension}";
 
 		if (More_Logs): Log.Stateless(f"{Molru_Name}: {Type} of {End - Start} Bytes @ 0x{String.Trailing_Zero(Start, Trailing_Zeros)}-0x{String.Trailing_Zero(End, Trailing_Zeros)} // \"{File_Name}\"");
-		with open(f"Extracted/{F.replace(".molru", "")}/{File_Name}", "w+b") as Data: Data.write(Bytes[Start:End]);
+		with open(f"Extracted/{Molru_Path}/{File_Name}", "w+b") as Data: Data.write(Bytes[Start:End]);
 
 
 
@@ -229,7 +238,11 @@ def Extract_Regex(F: str) -> None:
 
 
 	# Catch unknown data at the end of files
-	if (Offset != len(Bytes)): Write_Unknown(Offset);
+	if (Offset != len(Bytes)): Write_Unknown(None);
+	if (Molru_Path in MXMC_Dictionary.keys()):
+		if (len(MXMC_Dictionary[Molru_Path]) != 0):
+			Log.Critical(f"The MXMC tells us there's {len(MXMC_Dictionary[Molru_Path])} more files hidden... But Kozeki failed to identify them!");
+
 	if (More_Logs): Log.Stateless(f"{F}: Finished Processing in {Time.Elapsed_String(Time.Get_Unix(True) - Molru_Init, " ", Show_Until=-3)}");
 	#exit();
 
