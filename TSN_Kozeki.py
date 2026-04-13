@@ -12,6 +12,12 @@ MXMC_Only: bool = False;
 MXMC_Disabled: bool = False;
 MXMC_Dictionary: dict[str, list[tuple[str, str, str, str]]] = {};
 
+# Determine which version of the game we are running, and set the Root folder where PUB is located accordingly
+if (File.Exists("PUB/Ressource/Catalogue/iOS")):
+	Data_Folder: str = ""; # This support is only theoretical because I can't get a version of Python higher than 3.9.9 on my iPhone, Palera1n Strap please fix
+else: # PC (Steam)
+	Data_Folder: str = "BlueArchive_Data/StreamingAssets/";
+
 
 
 
@@ -29,7 +35,7 @@ def MX_MediaCatalog() -> None:
 	MXMC_Init: int = Time.Get_Unix(True); MXMC_Progress: int = MXMC_Init;
 	Key: str;
 
-	with open("BlueArchive_Data/StreamingAssets/PUB/Resource/Catalog/MediaResources/MediaCatalog.bytes", "r+b") as NCB: MXMC_Data: bytes = NCB.read();
+	with open(f"{Data_Folder}PUB/Resource/Catalog/MediaResources/MediaCatalog.bytes", "r+b") as NCB: MXMC_Data: bytes = NCB.read();
 
 	Log.Stateless(f"Calculating MXMC Hash...");
 	MXMC_Dictionary["__Hash"] = hashlib.md5(MXMC_Data, usedforsecurity=False).hexdigest(); # pyright: ignore[reportArgumentType]
@@ -51,7 +57,7 @@ def MX_MediaCatalog() -> None:
 			else: Log.Warning(f"An MXMC Definitions Cache was found but is outdated! Will need to rediscover... (Expected {MXMC_Dictionary["__Hash"]}, got {MXMC_Cached["__Hash"]})");
 		else: Log.Warning(f"Pre-{App.Name} v0.8.3 MXMC Cache found, the cache will need to be re-discovered to properly make sure it is up to date!");
 	else: Log.Warning(f"No MXMC Definitions Cache was found, discovering file names...");
-	Log.Stateless("Kozeki will now attempt to parse every single Filename that Blue Archive uses inside the BlueArchive_Data/StreamingAssets/ folder.\nThis is used so that exported data from Molru files have proper file names instead of their raw hex positions.");
+	Log.Stateless("Kozeki will now attempt to parse every single Filename that Blue Archive uses.\nThis is used so that exported data from Molru files have proper file names instead of their raw hex positions.");
 
 	Entries_Processed: int = 0;
 	while (Entries_Processed < MXMC_Dictionary["__Size"]):
@@ -66,9 +72,9 @@ def MX_MediaCatalog() -> None:
 		Content_Folder: bytes = MXMC_Data[iLength+pLength+1:iLength+pLength+2];
 
 		match Content_Folder:
-			case b"\x03": Key_Pre: str = "BlueArchive_Data/StreamingAssets/PUB/Resource/GameData/MediaResources/";
-			case b"\x02": Key_Pre: str = "BlueArchive_Data/StreamingAssets/PUB/Resource/Preload/MediaResources/";
-			case b"\x01": Key_Pre: str = "BlueArchive_Data/StreamingAssets/";
+			case b"\x03": Key_Pre: str = f"{Data_Folder}PUB/Resource/GameData/MediaResources/";
+			case b"\x02": Key_Pre: str = f"{Data_Folder}PUB/Resource/Preload/MediaResources/";
+			case b"\x01": Key_Pre: str = f"{Data_Folder}";
 			case _:
 				Log.Critical(f"John Nexon added a new Folder ID to the MXMC File Format, please notify Ascellayn to go coin himself in THE FINALS.\nKozeki will now close to prevent bad extractions. And by close we mean crashin-");
 				raise Exception(Content_Folder);
@@ -237,9 +243,9 @@ def Extract_Regex(F: str) -> None:
 
 
 def Kozeki_Extractor(Extractor: str) -> None:
-	if (not File.Exists("BlueArchive_Data")): Log.Critical("The \"BlueArchive_Data\" folder was not found! Quitting."); exit();
+	if (not File.Exists("BlueArchive_Data") and not File.Exists("PUB")): Log.Critical("The \"BlueArchive_Data\" or \"PUB\" folder was not found! Quitting."); exit();
 
-	Tree: File.Folder_Tree = File.Tree("BlueArchive_Data");
+	Tree: File.Folder_Tree = File.Tree("BlueArchive_Data") if File.Exists("BlueArchive_Data") else File.Tree("PUB");
 	def Molru_Recursion(Folder_Matrix: File.Folder_Matrix, Path: str = "BlueArchive_Data/", Molrus: set[str] = set()) -> set[str]:
 		def Molru_Files(Files: list[str], Path: str) -> set[str]:
 			sMolrus: set[str] = set();
