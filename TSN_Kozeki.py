@@ -352,6 +352,15 @@ def Help():
 	print("\t--skip-mxmc \t\t= Do not use the MXMC Definitions System when extracting files. Files will not have easy to read names.");
 	print("\t--only-mxmc \t\t= Only execute Kozeki to generate a MXMC Definitions Cache, used for Data Research. Also saves an uncompressed version.");
 
+
+
+
+
+
+
+
+
+
 if (__name__ == '__main__'):
 	global Debug_Mode; Debug_Mode: bool;
 	App.JSON({
