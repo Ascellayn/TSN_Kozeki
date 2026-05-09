@@ -1,0 +1,33 @@
+name: Run Ogata TSN's Python Linter
+
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  Ogata-Linter:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5 
+        with:
+          python-version: '3.12'
+
+      - name: Clone GuillaumeFalourd/poc-github-actions PUBLIC repository
+        uses: GuillaumeFalourd/clone-github-repo-action@v2.3
+        with:
+          depth: 1
+          branch: 'main'
+          owner: 'Ascellayn'
+          repository: 'TSN_Ogata'
+
+      - name: Install TSN Abstracter
+        run: pip install tsn-abstracter
+
+      - name: Run TSN Ogata
+        run: python TSN_Ogata/TSN_Ogata.py

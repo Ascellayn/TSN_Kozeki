@@ -33,7 +33,6 @@ def MX_MediaCatalog() -> None:
 	global MXMC_Dictionary;
 
 	MXMC_Init: int = Time.Get_Unix(True); MXMC_Progress: int = MXMC_Init;
-	Key: str;
 
 	with open(f"{Data_Folder}PUB/Resource/Catalog/MediaResources/MediaCatalog.bytes", "r+b") as NCB: MXMC_Data: bytes = NCB.read();
 
@@ -79,7 +78,7 @@ def MX_MediaCatalog() -> None:
 				Log.Critical(f"John Nexon added a new Folder ID to the MXMC File Format, please notify Ascellayn to go coin himself in THE FINALS.\nKozeki will now close to prevent bad extractions. And by close we mean crashin-");
 				raise Exception(Content_Folder);
 		
-		Key = Key_Pre + "/".join(pName.split("/")[:-1]);
+		Key: str = Key_Pre + "/".join(pName.split("/")[:-1]);
 		if (Key not in MXMC_Dictionary.keys()): MXMC_Dictionary[Key] = [];
 		MXMC_Dictionary[Key].append((
 			iName,
@@ -96,7 +95,7 @@ def MX_MediaCatalog() -> None:
 		MXMC_Data = MXMC_Data[iLength+pLength+9:];
 		Entries_Processed += 1;
 
-	Log.Awaited().OK(f"{len(MXMC_Dictionary.keys())} Folder Definitions Found")
+	Log.Awaited().OK(f"{len(MXMC_Dictionary.keys())} Folder Definitions Found");
 
 	Log.Info(f"Writing Cached MXMC cJSON...");
 	File.JSON_Write("MXMC_Definitions.cjson", MXMC_Dictionary, True);
@@ -164,6 +163,8 @@ def Extract_Regex(F: str) -> None:
 				with open(f"Extracted/{Molru_Path}/0x{String.Trailing_Zero(Offset, Trailing_Zeros)}-0x{String.Trailing_Zero(len(Bytes), Trailing_Zeros)}.hex", "w+b") as Data:
 					Data.write(Bytes[Offset:]);
 
+
+
 	def Write_Data(Type: str, Extension: str, Start: int, End: int) -> None:
 		MXMC_Definitions: tuple[str, str, str, str] | None = None;
 		File_Name: str | None = None;
@@ -188,9 +189,9 @@ def Extract_Regex(F: str) -> None:
 
 
 	def Found(Indexes: tuple[int, int]) -> bool: return False if (Indexes == (-1, -1)) else True;
-	for Match in Extract:
-		if (Found(Match.span(1))): # JFIF / EXIF
-			Start: int = Match.span(1)[0]; End: int = Match.span(1)[1];
+	for m in Extract:
+		if (Found(m.span(1))): # JFIF / EXIF
+			Start: int = m.span(1)[0]; End: int = m.span(1)[1];
 			match (Bytes[Start+3:Start+4]):
 				case b"\xE0": Write_Data("JFIF", "JFIF.jpg", Start, End);
 				case b"\xE1": Write_Data("EXIF", "EXIF.jpg", Start, End);
@@ -202,8 +203,8 @@ def Extract_Regex(F: str) -> None:
 
 
 
-		if (Found(Match.span(2))): # OGG
-			Start: int = Match.span(2)[0];
+		if (Found(m.span(2))): # OGG
+			Start: int = m.span(2)[0];
 			Segments: int = int.from_bytes(Bytes[Start+27:Start+28:]);
 			End: int = Start + 28 + Segments;
 			Log.Debug(f"{Molru_Name}: OGG Header | Segments: {Segments} - Start: 0x{String.Trailing_Zero(Start, Trailing_Zeros)} - End: 0x{String.Trailing_Zero(End, Trailing_Zeros)} - Bytes: {End - Start}");
@@ -227,8 +228,8 @@ def Extract_Regex(F: str) -> None:
 
 
 
-		if (Found(Match.span(3))): # PNG
-			Start: int = Match.span(3)[0]; End: int = Match.span(3)[1];
+		if (Found(m.span(3))): # PNG
+			Start: int = m.span(3)[0]; End: int = m.span(3)[1];
 			Write_Data("PNG", "png", Start, End);
 			Write_Unknown(Start);
 			Offset = End; continue;
@@ -262,22 +263,22 @@ def Kozeki_Extractor(Extractor: str) -> None:
 	def Molru_Recursion(Folder_Matrix: File.Folder_Matrix, Path: str = "BlueArchive_Data/", Molrus: set[str] = set()) -> set[str]:
 		def Molru_Files(Files: list[str], Path: str) -> set[str]:
 			sMolrus: set[str] = set();
-			for F in Files:
-				if (F.endswith(".molru")):
-					sMolrus.add(f"{Path}{F}");
+			for f in Files:
+				if (f.endswith(".molru")):
+					sMolrus.add(f"{Path}{f}");
 			return sMolrus;
 
 		Path += f"{Folder_Matrix[0]}/"; Log.Debug(Path);
 		Molrus.update(Molru_Files(list(Folder_Matrix[1][1]), Path));
 
-		for Folder in Folder_Matrix[1][0]:
-			Molrus.update(Molru_Recursion(Folder, Path, Molrus));
+		for f in Folder_Matrix[1][0]:
+			Molrus.update(Molru_Recursion(f, Path, Molrus));
 		
 		return Molrus;
 
 	Molrus: set[str] = set();
-	for Folder in Tree[0]:
-		Molrus.update(Molru_Recursion(Folder));
+	for f in Tree[0]:
+		Molrus.update(Molru_Recursion(f));
 
 	Log.Info(f"Discovered {len(Molrus)} Molru files, proceeding to extraction.");
 
@@ -302,8 +303,9 @@ def Kozeki_Extractor(Extractor: str) -> None:
 	Log.Stateless(f"Extraction finished in {Time.Elapsed_String(Time.Get_Unix(True) - Extract_Init, " ", Show_Until=-3)}.");
 
 
+
 def Kozeki_Repacker(Repacked_Folder: str) -> None:
-	Log.Critical(f"The Kozeki Repacker currently does not create Molru files that can be loaded by Blue Archive.\nWe currently do not know how the Molru headers from Hex 0x04 to 0x34 work, which in turn, as likely a checksum is present, makes the game refuse to load properly the Molru file even if you bypass the \"Abnormal Client Detected\" message.\nThis feature is thus currently merely here for research purposes as of Kozeki v{".".join(String.ify_Array(App.Version))}.")
+	Log.Critical(f"The Kozeki Repacker currently does not create Molru files that can be loaded by Blue Archive.\nWe currently do not know how the Molru headers from Hex 0x04 to 0x34 work, which in turn, as likely a checksum is present, makes the game refuse to load properly the Molru file even if you bypass the \"Abnormal Client Detected\" message.\nThis feature is thus currently merely here for research purposes as of Kozeki v{".".join(String.ify_Array(App.Version))}.");
 	if (not File.Exists(Repacked_Folder)): Log.Critical(f"The \"{Repacked_Folder}\" folder was not found! Quitting."); exit();
 
 	Buffer: bytes = b""; Repacked_Name: str = Repacked_Folder.split("/")[-1];
@@ -311,14 +313,15 @@ def Kozeki_Repacker(Repacked_Folder: str) -> None:
 
 
 	Log.Info(f"Repacking {Repacked_Name} containing {len(Folder[1])} files...");
-	for Count, Data in enumerate(sorted(Folder[1])):
-		Log.Debug(f"Reading: {Data}");
-		with open(f"{Repacked_Folder}/{Data}", "r+b") as Data_Raw: Buffer += Data_Raw.read();
-		Log.Carriage(f"Processed {Count+1}/{len(Folder[1])} Files");
+	for i, data in enumerate(sorted(Folder[1]), start=1):
+		Log.Debug(f"Reading: {data}");
+		with open(f"{Repacked_Folder}/{data}", "r+b") as Data_Raw: Buffer += Data_Raw.read();
+		Log.Carriage(f"Processed {i}/{len(Folder[1])} Files");
 	Log.Debug(f"Molru file of {len(Buffer)} Bytes in size.");
 	
 	with open(f"{Repacked_Name}.molru", "w+b") as Data: Data.write(Buffer);
 	Log.Awaited().OK();
+
 
 
 
@@ -351,16 +354,22 @@ def Help():
 
 if (__name__ == '__main__'):
 	global Debug_Mode; Debug_Mode: bool;
-	App.Name = "Kozeki";
-	App.Description = "Kozeki is a TSNA based tool to extract Blue Archive's .molru PC files, a cursed file type given to us who like to poke around a bit too much.";
-	App.Author = ["Ascellayn", "The Sirio Network"];
-	App.License = "TSN License 2.1 - Universal";
-	App.License_Year = "2025-2026";
-	App.Codename = "TSN_Kozeki";
-	App.Branch = "Azure";
-	App.Version = (0,8,4);
-	App.TSNA = (6,0,0);
-
+	App.JSON({
+		"Name": "Kozeki",
+		"Description": "Kozeki is a TSNA based tool to extract Blue Archive's .molru PC files, a cursed file type given to us who like to poke around a bit too much.",
+		"Author": ["Ascellayn", "The Sirio Network"],
+		"Contributors": [],
+		"License": "TSN License 2.2 - Universal",
+		"License_Year": "2025-2026",
+		"Codename": "TSN_Kozeki",
+		"Branch": "Azure",
+		"Version": [0,8,5],
+		"Version_Prefix": "",
+		"Version_Suffix": "",
+		"TSNA": [6,1,0],
+		"Public": [],
+		"Private": []
+	});
 	TSN_Abstracter.App_Init(False);
 
 
@@ -378,7 +387,7 @@ if (__name__ == '__main__'):
 			Help(); exit();
 
 		try:
-			while (sys.argv):
+			while (sys.argv): # TODO: Use argparse instead
 				match (sys.argv[0]):
 					case "--extractor": Extractor = sys.argv.pop(1);
 					case "--repack": Repack_Folder = sys.argv.pop(1);
