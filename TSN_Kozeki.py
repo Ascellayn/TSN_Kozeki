@@ -246,7 +246,10 @@ def Extract_Regex(F: str) -> None:
 	if (Offset != len(Bytes)): Write_Unknown(None);
 	if (Molru_Path in MXMC_Dictionary.keys()):
 		if (len(MXMC_Dictionary[Molru_Path]) != 0):
-			Log.Critical(f"The MXMC tells us there's {len(MXMC_Dictionary[Molru_Path])} more files hidden... But Kozeki failed to identify them!");
+			Log.Critical(f"Failed to identify {len(MXMC_Dictionary[Molru_Path])} more files in {Molru_Path}:");
+			while (len(MXMC_Dictionary[Molru_Path]) != 0):
+				Log.Error(f"{MXMC_Dictionary[Molru_Path][0][3]}");
+				MXMC_Dictionary[Molru_Path].pop();
 
 	if (More_Logs): Log.Stateless(f"{F}: Finished Processing in {Time.Elapsed_String(Time.Get_Unix(True) - Molru_Init, " ", Show_Until=-3)}");
 	#exit();
@@ -260,8 +263,10 @@ def Extract_Regex(F: str) -> None:
 
 
 
-def Pool_Initializer(more_logs: bool, data_folder: str, mxmc_dictionary: dict[str, list[tuple[str, str, str, str]]]):
-	global More_Logs, Data_Folder, MXMC_Dictionary;
+def Pool_Initializer(debug: bool, print_level: int, more_logs: bool, data_folder: str, mxmc_dictionary: dict[str, list[tuple[str, str, str, str]]]):
+	global Debug_Mode, More_Logs, Data_Folder, MXMC_Dictionary;
+	Debug_Mode = debug;
+	Config.Logger.Print_Level = print_level;
 	More_Logs = more_logs;
 	Data_Folder = data_folder;
 	MXMC_Dictionary = mxmc_dictionary;
@@ -296,7 +301,7 @@ def Kozeki_Extractor(Extractor: str) -> None:
 
 	Extract_Init: float = Time.Get_Unix(True);
 
-	with multiprocessing.Pool(Extraction_Threads, initializer=Pool_Initializer, initargs=(More_Logs, Data_Folder, MXMC_Dictionary)) as P:
+	with multiprocessing.Pool(Extraction_Threads, initializer=Pool_Initializer, initargs=(Debug_Mode, Config.Logger.Print_Level, More_Logs, Data_Folder, MXMC_Dictionary)) as P:
 		match Extractor.lower():
 			case "regex": P.imap_unordered(Extract_Regex, Molrus);
 			case _: raise Exception(f"Unknown Extractor: {Extractor}");
@@ -353,9 +358,10 @@ def Help():
 	print("When running without any arguments, by defaults extracts every Molru file found in the BlueArchive_Data directory.");
 	print("");
 	print("Options");
-	print("\t-h\t\t\t= Print usage information and exit.");
+	print("\t-h (--help)\t\t\t= Print usage information and exit.");
 	print("\t-d\t\t\t= Enable Debug Mode.");
 	print("\t--more-logs\t\t= Show which files are being extracted, drastically lowers performance.");
+	print("\t--no-warn\t\t= Disable warnings.");
 	print("");
 	print("\t--extractor <extractor>\t= Enforce an extraction method. Available ones are: 'regex'. (default: 'regex').");
 	print("\t-t <threads>\t= Set how many threads Kozeki should use to Extract Molru files. Set this value lower to prevent overloading your device. (default: Maximimum available CPU Cores).");
@@ -384,7 +390,7 @@ if (__name__ == '__main__'):
 		"License_Year": "2025-2026",
 		"Codename": "TSN_Kozeki",
 		"Branch": "Azure",
-		"Version": [0,8,6],
+		"Version": [0,8,7],
 		"Version_Prefix": "",
 		"Version_Suffix": "",
 		"TSNA": [6,1,0],
@@ -404,9 +410,8 @@ if (__name__ == '__main__'):
 
 	argv: list[str] = sys.argv[:];
 	if (len(argv) > 1):
-		print(argv);
 		argv.pop(0); # Useless
-		if ("-h" in argv):
+		if ("-h" in argv or "--help" in argv):
 			Help(); exit();
 
 		try:
@@ -419,6 +424,7 @@ if (__name__ == '__main__'):
 					case "--skip-mxmc": MXMC_Disabled = True;
 					case "--only-mxmc": MXMC_Disabled = False; MXMC_Only = True;
 					case "--more-logs": More_Logs = True;
+					case "--no-warn": Config.Logger.Print_Level = 40;
 					case _: raise Exception(f"Unknown argument: {argv[0]}");
 				argv.pop(0);
 
@@ -431,7 +437,8 @@ if (__name__ == '__main__'):
 	except NameError: Debug_Mode = False;
 
 	# TSNA Configuration
-	Config.Logger.Print_Level = 15 if (Debug_Mode) else 20; # type: ignore | > I SAID ITS GONNA BE ALRIGHT
+	if (Debug_Mode): # type: ignore | > I SAID ITS GONNA BE ALRIGHT
+		Config.Logger.Print_Level = 15;
 	Config.Logger.File = False;
 
 	MX_MediaCatalog();
