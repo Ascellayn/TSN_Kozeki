@@ -6,7 +6,7 @@ import multiprocessing, os;
 
 
 
-More_Logs: bool = True;
+More_Logs: bool = False;
 
 MXMC_Only: bool = False;
 MXMC_Disabled: bool = False;
@@ -401,29 +401,30 @@ if (__name__ == '__main__'):
 	Extraction_Threads: int = os.process_cpu_count();
 	Repack_Folder: str | None = None;
 
-	if (len(sys.argv) > 1):
-		sys.argv.pop(0); # Useless
-		if ("-h" in sys.argv):
+	argv: list[str] = sys.argv[:];
+	if (len(argv) > 1):
+		print(argv);
+		argv.pop(0); # Useless
+		if ("-h" in argv):
 			Help(); exit();
 
 		try:
-			while (sys.argv): # TODO: Use argparse instead
-				match (sys.argv[0]):
-					case "--extractor": Extractor = sys.argv.pop(1);
-					case "--repack": Repack_Folder = sys.argv.pop(1);
-					case "-t": Extraction_Threads = int(sys.argv.pop(1));
+			while (argv): # TODO: Use argparse instead
+				match (argv[0]):
+					case "--extractor": Extractor = argv.pop(1);
+					case "--repack": Repack_Folder = argv.pop(1);
+					case "-t": Extraction_Threads = int(argv.pop(1));
 					case "-d": Debug_Mode = True; print("== DEBUG MODE ENABLED ==");
 					case "--skip-mxmc": MXMC_Disabled = True;
 					case "--only-mxmc": MXMC_Disabled = False; MXMC_Only = True;
 					case "--more-logs": More_Logs = True;
-					case _: raise Exception(f"Unknown argument: {sys.argv[0]}");
-				sys.argv.pop(0);
+					case _: raise Exception(f"Unknown argument: {argv[0]}");
+				argv.pop(0);
 
 		except Exception as Except:
 			print(f"FATAL: A missing or invalid argument was passed through! Exiting.");
 			raise Except;
 			# ↑ Catching and then raising the exception is intended. Still informs the user what argument they got wrong without me having to do it myself, painfully copy pasting basically the same ugly code multiple times.
-
 
 	try: Debug_Mode; # type: ignore | > shush, it's gonna be alright bb girl
 	except NameError: Debug_Mode = False;
