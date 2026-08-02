@@ -150,7 +150,11 @@ def Extract_Regex(F: str) -> None:
 	def Write_Unknown(Start: int | None) -> None:
 		if (Start):
 			if ((Start - Offset == 0)): return;
-			Log.Warning(f"{Molru_Name}: Hex of {Start - Offset} Bytes @ 0x{String.Trailing_Zero(Offset, Trailing_Zeros)}-0x{String.Trailing_Zero(Start, Trailing_Zeros)}");
+
+			# Avoid printing warning if it's the molru header
+			if (Start != 53 and Offset != 0):
+				Log.Warning(f"{Molru_Name}: Hex of {Start - Offset} Bytes @ 0x{String.Trailing_Zero(Offset, Trailing_Zeros)}-0x{String.Trailing_Zero(Start, Trailing_Zeros)}");
+
 			with open(f"Extracted/{Molru_Path}/0x{String.Trailing_Zero(Offset, Trailing_Zeros)}-0x{String.Trailing_Zero(Start, Trailing_Zeros)}.hex", "w+b") as Data:
 				Data.write(Bytes[Offset:Start]);
 		else: # Flush the entire rest of the file if Start is None
@@ -372,7 +376,7 @@ if (__name__ == '__main__'):
 		"License_Year": "2025-2026",
 		"Codename": "TSN_Kozeki",
 		"Branch": "Azure",
-		"Version": [0,8,5],
+		"Version": [0,8,6],
 		"Version_Prefix": "",
 		"Version_Suffix": "",
 		"TSNA": [6,1,0],
