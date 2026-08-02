@@ -6,7 +6,7 @@ import multiprocessing, os;
 
 
 
-More_Logs: bool = False;
+More_Logs: bool = True;
 
 MXMC_Only: bool = False;
 MXMC_Disabled: bool = False;
@@ -108,7 +108,7 @@ def MX_MediaCatalog() -> None:
 def Extract_Regex(F: str) -> None:
 	""" Regex extraction, requires a hefty amount of memory and can be slow for larger files."""
 	Molru_Init: int = Time.Get_Unix(True);
-	
+
 	Molru_Name: str = F.split("/")[-1];
 	Molru_Path: str = F.replace(".molru", "");
 	File.Path_Require(f"Extracted/{F.replace(".molru", "")}/");
@@ -259,6 +259,13 @@ def Extract_Regex(F: str) -> None:
 
 
 
+def Pool_Initializer(more_logs: bool, data_folder: str, mxmc_dictionary: dict[str, list[tuple[str, str, str, str]]]):
+	global More_Logs, Data_Folder, MXMC_Dictionary;
+	More_Logs = more_logs;
+	Data_Folder = data_folder;
+	MXMC_Dictionary = mxmc_dictionary;
+
+
 
 def Kozeki_Extractor(Extractor: str) -> None:
 	if (not File.Exists("BlueArchive_Data") and not File.Exists("PUB")): Log.Critical("The \"BlueArchive_Data\" or \"PUB\" folder was not found! Quitting."); exit();
@@ -288,7 +295,7 @@ def Kozeki_Extractor(Extractor: str) -> None:
 
 	Extract_Init: float = Time.Get_Unix(True);
 
-	with multiprocessing.Pool(Extraction_Threads) as P:
+	with multiprocessing.Pool(Extraction_Threads, initializer=Pool_Initializer, initargs=(More_Logs, Data_Folder, MXMC_Dictionary)) as P:
 		match Extractor.lower():
 			case "regex": P.imap_unordered(Extract_Regex, Molrus);
 			case _: raise Exception(f"Unknown Extractor: {Extractor}");
