@@ -48,11 +48,14 @@ Or if you're more advanced, clone the TSNA repository and add the cloned folder 
 You may run `python3 TSN_Kozeki.py -h` to get a list of the following arguments:  
 ```
 Options
-	-h			= Print usage information and exit.
+	-h (--help)			= Print usage information and exit.
 	-d			= Enable Debug Mode.
 	--more-logs		= Show which files are being extracted, drastically lowers performance.
+	--no-warn		= Disable warnings.
 
 	--extractor <extractor>	= Enforce an extraction method. Available ones are: 'regex'. (default: 'regex').
+	-t <threads>	= Set how many threads Kozeki should use to Extract Molru files. Set this value lower to prevent overloading your device. (default: Maximimum available CPU Cores).
+
 	--repack <folder>	= The folder containing the data we wish to repack as a Molru file.
 	--skip-mxmc 		= Do not use the MXMC Definitions System when extracting files. Files will not have easy to read names.
 	--only-mxmc 		= Only execute Kozeki to generate a MXMC Definitions Cache, used for Data Research. Also saves an uncompressed version.
