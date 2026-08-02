@@ -246,10 +246,10 @@ def Extract_Regex(F: str) -> None:
 	if (Offset != len(Bytes)): Write_Unknown(None);
 	if (Molru_Path in MXMC_Dictionary.keys()):
 		if (len(MXMC_Dictionary[Molru_Path]) != 0):
-			Log.Critical(f"Failed to identify {len(MXMC_Dictionary[Molru_Path])} more files in {Molru_Path}:");
+			Log.Critical(f"Failed to extract {len(MXMC_Dictionary[Molru_Path])} more files in {Molru_Path}\n:");
 			while (len(MXMC_Dictionary[Molru_Path]) != 0):
 				Log.Error(f"{MXMC_Dictionary[Molru_Path][0][3]}");
-				MXMC_Dictionary[Molru_Path].pop();
+				MXMC_Dictionary[Molru_Path].pop(0);
 
 	if (More_Logs): Log.Stateless(f"{F}: Finished Processing in {Time.Elapsed_String(Time.Get_Unix(True) - Molru_Init, " ", Show_Until=-3)}");
 	#exit();
