@@ -259,6 +259,7 @@ def Extract_Regex(F: str) -> None:
 
 
 
+
 def Pool_Initializer(more_logs: bool, data_folder: str, mxmc_dictionary: dict[str, list[tuple[str, str, str, str]]]):
 	global More_Logs, Data_Folder, MXMC_Dictionary;
 	More_Logs = more_logs;
